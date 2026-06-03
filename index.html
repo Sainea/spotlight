@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SPOTLIGHT | Reserva de Espacios Premium, Salones y Canchas</title>
+  <meta name="description" content="Encuentra y reserva espacios únicos para eventos o canchas deportivas en Barranquilla. Logística premium integrada por Spotlight Events.">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Toast Notifications -->
+  <div id="app-toast" class="toast">
+    <span class="toast-icon">⚡</span>
+    <span id="toast-message" class="toast-text">Mensaje de notificación</span>
+  </div>
+
+  <!-- Main Navigation Header -->
+  <header>
+    <div class="container header-container">
+      <div class="logo" onclick="app.navigateTo('explore')">
+        <div class="logo-icon">S</div>
+        <span class="gold-text">SPOTLIGHT</span>
+      </div>
+
+      <nav>
+        <span class="nav-link active" id="nav-explore" onclick="app.navigateTo('explore')" data-translate="exploreBtn">Explorar Espacios</span>
+        <span class="nav-link" id="nav-logistics" onclick="app.navigateTo('logistics')" data-translate="logisticsBtn">Logística</span>
+        <span class="nav-link" id="nav-favorites" onclick="app.navigateTo('favorites')" data-translate="favorites">Favoritos</span>
+        <span class="nav-link" id="nav-presentation" onclick="app.navigateTo('presentation')" data-translate="presentationBtn">Pitch SENA</span>
+        <span class="nav-link" id="nav-support" onclick="app.navigateTo('support')" data-translate="support">Soporte</span>
+        <span class="nav-link" id="nav-dashboard" onclick="app.navigateTo('dashboard')" style="display:none;" data-translate="dashboard">Dashboard</span>
+        <span class="nav-link" id="nav-admin" onclick="app.navigateTo('admin')" style="display:none;" data-translate="adminPanel">Admin</span>
+      </nav>
+
+      <div class="header-actions">
+        <!-- Language selector -->
+        <select class="lang-selector" onchange="app.changeLanguage(this.value)">
+          <option value="es">ES</option>
+          <option value="en">EN</option>
+          <option value="pt">PT</option>
+          <option value="fr">FR</option>
+        </select>
+
+        <!-- Theme toggle -->
+        <button class="btn-icon" onclick="app.toggleTheme()" title="Cambiar tema">
+          🌓
+        </button>
+
+        <!-- Auth button -->
+        <div id="auth-actions">
+          <button class="btn btn-secondary" onclick="app.openModal('login')" data-translate="login">Iniciar Sesión</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+    <!-- 1. EXPLORE & LANDING VIEW -->
+    <div id="view-explore" class="view-container active">
+      <section class="hero-section">
+        <div class="hero-spotlight-beam"></div>
+        <div class="container hero-content">
+          <div class="hero-tagline" data-translate="sponsors">SPOTLIGHT EVENTS</div>
+          <h1 class="hero-title animate-fade">
+            <span data-translate="heroTitle">Reserva espacios, salones</span>
+            <span class="gold-text" style="font-weight: 800;">y canchas únicas</span>
+          </h1>
+          <p class="hero-subtitle animate-fade" data-translate="heroSubtitle">
+            Organiza eventos memorables con la logística de Spotlight Events o alquila canchas para tus torneos favoritos.
+          </p>
+
+          <div class="hero-actions">
+            <button class="btn btn-gold btn-lg" onclick="app.navigateTo('presentation')">
+              <span>🎤</span> <span data-translate="presentationBtn">Ver Pitch SENA</span>
+            </button>
+            <button class="btn btn-secondary btn-lg" onclick="app.navigateTo('logistics')">
+              <span>💡</span> <span data-translate="logisticsBtn">Contratar Logística</span>
+            </button>
+          </div>
+
+          <!-- Floating search bar -->
+          <div class="search-container glass-panel">
+            <div class="search-field">
+              <div style="display:flex; justify-content:space-between; align-items:center;">
+                <label for="search-input" data-translate="searchPlaceholder">Buscar</label>
+                <button onclick="app.detectUserLocation()" style="background:transparent; border:none; color:var(--accent-gold); font-size:11px; cursor:pointer; font-weight:700; display:flex; align-items:center; gap:3px;">
+                  📍 <span id="location-btn-text">Detectar Ubicación</span>
+                </button>
+              </div>
+              <input type="text" id="search-input" placeholder="Ej: Alto Prado, F11, Salón" oninput="app.filterListings()">
+            </div>
+            <div class="search-field">
+              <label for="search-type" data-translate="theme">Categoría</label>
+              <select id="search-type" onchange="app.filterListings()">
+                <option value="all" data-translate="all">Todos</option>
+                <option value="salon" data-translate="salons">Salones & Espacios</option>
+                <option value="cancha" data-translate="fields">Canchas Deportivas</option>
+                <option value="espacio">Rooftops & Quintas</option>
+              </select>
+            </div>
+            <div class="search-field">
+              <label for="search-capacity" data-translate="capacity">Capacidad Mínima</label>
+              <select id="search-capacity" onchange="app.filterListings()">
+                <option value="0">Cualquiera</option>
+                <option value="10">10+ personas</option>
+                <option value="50">50+ personas</option>
+                <option value="150">150+ personas</option>
+              </select>
+            </div>
+            <button class="search-btn" onclick="app.filterListings()">
+              🔍 <span data-translate="exploreBtn">Buscar</span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Category Filter Tabs -->
+      <div class="container">
+        <div class="category-bar">
+          <button class="category-tab active" id="cat-all" onclick="app.setCategoryFilter('all')" data-translate="all">Todos</button>
+          <button class="category-tab" id="cat-salon" onclick="app.setCategoryFilter('salon')" data-translate="salons">Salones & Espacios</button>
+          <button class="category-tab" id="cat-cancha" onclick="app.setCategoryFilter('cancha')" data-translate="fields">Canchas Deportivas</button>
+        </div>
+      </div>
+
+      <!-- Spaces Listing Grid -->
+      <section class="listing-section">
+        <div class="container">
+          <div class="listing-grid-header">
+            <h2 id="listings-count-title">Cargando espacios...</h2>
+          </div>
+          <div class="listing-grid" id="listings-grid-container">
+            <!-- Dynamic Space Cards loaded via JS -->
+          </div>
+        </div>
+      </section>
+
+      <!-- About Us / Quiénes Somos Section -->
+      <section class="about-block" id="about-us-section">
+        <div class="container">
+          <div class="about-grid">
+            <div class="about-visual">
+              <img class="about-img" src="https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&w=800&q=80" alt="Spotlight Events">
+              <div class="about-overlay">
+                <div>
+                  <h3 style="font-size: 24px; margin-bottom: 8px;">SPOTLIGHT EVENTS</h3>
+                  <p data-translate="heroSubtitle">Calidad premium en organización y logística.</p>
+                </div>
+              </div>
+            </div>
+            <div>
+              <div class="hero-tagline" data-translate="aboutUs">Quiénes Somos</div>
+              <h2 style="font-size: 36px; margin-bottom: 20px;" class="gold-text">Calidad Antes que Cantidad</h2>
+              <p style="margin-bottom: 16px; color: var(--text-secondary);">
+                Fundada en 2026 por <strong>Brayan Sainea (Sagan)</strong>, Spotlight es una plataforma Colombo-Estadounidense diseñada para revolucionar la forma en que reservamos locaciones y planeamos eventos.
+              </p>
+              <p style="margin-bottom: 16px; color: var(--text-secondary);">
+                Conectamos a dueños de espacios exclusivos y complejos deportivos directamente con los organizadores, ofreciendo herramientas de geolocalización, disponibilidad exacta en tiempo real y la opción única de contratar nuestro equipo de producción logística de primer nivel.
+              </p>
+              <div style="display: flex; gap: 20px; margin-top: 30px;">
+                <div>
+                  <h4 style="font-size: 24px; color: var(--accent-gold);">10%</h4>
+                  <p style="font-size: 11px; text-transform: uppercase; color: var(--text-muted);">Comisión Justa por Reserva</p>
+                </div>
+                <div>
+                  <h4 style="font-size: 24px; color: var(--accent-gold);">Barranquilla</h4>
+                  <p style="font-size: 11px; text-transform: uppercase; color: var(--text-muted);">Centro Turístico Piloto</p>
+                </div>
+                <div>
+                  <h4 style="font-size: 24px; color: var(--accent-gold);">SENA</h4>
+                  <p style="font-size: 11px; text-transform: uppercase; color: var(--text-muted);">Talento Técnico en Desarrollo</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Sponsors Section -->
+      <section class="sponsors-section">
+        <div class="container">
+          <h3 class="sponsors-title" data-translate="sponsors">Patrocinadores & Alianzas</h3>
+          <div class="sponsors-grid" id="sponsors-container">
+            <!-- Loaded via data.js/app.js -->
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- 2. DETAIL VIEW -->
+    <div id="view-detail" class="view-container">
+      <div class="container detail-container">
+        <div class="detail-header">
+          <div class="detail-title-block">
+            <h1 id="detail-title">Nombre del Espacio</h1>
+            <div class="detail-subtitle-row">
+              <span class="card-rating"><span class="card-rating-star">★</span> <span id="detail-rating">4.9</span> (<span id="detail-reviews-count">12</span> reviews)</span>
+              <span>•</span>
+              <span id="detail-address">Dirección</span>
+            </div>
+          </div>
+          <div class="detail-actions-top">
+            <button class="btn btn-secondary" onclick="app.toggleFavoriteDetail()" id="detail-fav-btn">❤️ Guardar</button>
+            <button class="btn btn-secondary" onclick="app.navigateTo('explore')">← Volver</button>
+          </div>
+        </div>
+
+        <!-- Gallery Grid -->
+        <div class="detail-gallery">
+          <img id="detail-img-main" class="detail-gallery-main" src="" alt="Main Image">
+          <div class="detail-gallery-side">
+            <img id="detail-img-thumb1" class="detail-gallery-thumb" src="" alt="Side View 1">
+            <img id="detail-img-thumb2" class="detail-gallery-thumb" src="" alt="Side View 2">
+          </div>
+        </div>
+
+        <!-- Main detail contents -->
+        <div class="detail-content-grid">
+          <div class="detail-info-block">
+            
+            <!-- Host Card -->
+            <div class="detail-host-info">
+              <div class="host-profile">
+                <img id="detail-host-avatar" class="host-avatar" src="" alt="Host Avatar">
+                <div>
+                  <div class="host-name" id="detail-host-name">Propietario</div>
+                  <div class="host-role" id="detail-host-role" data-translate="host">Super Anfitrión</div>
+                </div>
+              </div>
+              <div style="text-align: right;">
+                <div style="font-weight: bold; color: var(--accent-gold);" id="detail-host-rating">★ 4.95</div>
+                <div style="font-size: 12px; color: var(--text-secondary);">Calificación Host</div>
+              </div>
+            </div>
+
+            <!-- Description -->
+            <div class="detail-description">
+              <h3 data-translate="description">Descripción</h3>
+              <p id="detail-desc-text">Texto descriptivo de la propiedad.</p>
+            </div>
+
+            <!-- Logistics service notice -->
+            <div class="detail-logistics-info">
+              <h4 id="detail-logistics-badge">💡 Logística de Evento Disponible</h4>
+              <p id="detail-logistics-desc">Descripción de la logística disponible en este local.</p>
+            </div>
+
+            <!-- Amenities/Servicios -->
+            <div class="detail-amenities">
+              <h3 data-translate="amenities">Lo que este lugar ofrece</h3>
+              <div class="amenities-grid" id="detail-amenities-container">
+                <!-- Rendered dynamically -->
+              </div>
+            </div>
+
+            <!-- Real Google Maps Embed -->
+            <div class="detail-map">
+              <h3 data-translate="exploreBtn">Cómo llegar (Mapa)</h3>
+              <div id="detail-map-container" style="border-radius: var(--radius-md); overflow: hidden; border: 1px solid var(--border-color); height: 350px; background: var(--bg-tertiary);">
+                <!-- Loaded dynamically in app.js -->
+              </div>
+            </div>
+
+            <!-- Comments/Reviews Section -->
+            <div class="detail-reviews">
+              <h3 data-translate="reviews">Comentarios de Clientes</h3>
+              <div id="detail-reviews-container" style="display: flex; flex-direction: column; gap: 16px;">
+                <!-- Loaded dynamically -->
+              </div>
+            </div>
+          </div>
+
+          <!-- Sticky booking card -->
+          <div>
+            <div class="booking-sidebar-card">
+              <div class="booking-card-price-row">
+                <div class="card-price" id="detail-price-text">$350.000 <span>/ hora</span></div>
+                <div style="font-size: 13px; color: var(--text-muted);" id="detail-capacity-badge">150 max</div>
+              </div>
+
+              <div class="booking-form-group">
+                <div class="booking-input-row">
+                  <div class="booking-input-field">
+                    <label for="book-date">Fecha</label>
+                    <input type="date" id="book-date" onchange="app.calculateTotalBooking()">
+                  </div>
+                  <div class="booking-input-field">
+                    <label for="book-hours">Horas</label>
+                    <select id="book-hours" onchange="app.calculateTotalBooking()">
+                      <option value="1">1 hora</option>
+                      <option value="2">2 horas</option>
+                      <option value="4">4 horas</option>
+                      <option value="8">8 horas</option>
+                      <option value="12">12 horas</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="booking-input-field">
+                  <label for="book-start-time">Hora Inicio</label>
+                  <select id="book-start-time">
+                    <option value="08:00">08:00 AM</option>
+                    <option value="10:00">10:00 AM</option>
+                    <option value="14:00">02:00 PM</option>
+                    <option value="16:00">04:00 PM</option>
+                    <option value="18:00">06:00 PM</option>
+                    <option value="20:00">08:00 PM</option>
+                  </select>
+                </div>
+
+                <!-- Logistics Selection Toggle -->
+                <div class="booking-input-field" id="booking-logistic-selection-wrapper">
+                  <label data-translate="logisticOptionTitle">Seleccionar Logística</label>
+                  <select id="book-logistics-select" onchange="app.calculateTotalBooking()">
+                    <option value="none" data-translate="logisticsOwn">No requerir logística / Traer propia</option>
+                    <option value="spotlight" data-translate="spotlightLogisticsFull">Contratar Spotlight Events (+10%)</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- Live Cost invoice -->
+              <div class="invoice-preview">
+                <div class="invoice-row">
+                  <span id="invoice-hours-calc">Alquiler básico</span>
+                  <span id="invoice-base-cost">$0</span>
+                </div>
+                <div class="invoice-row" id="invoice-logistics-row" style="display:none;">
+                  <span data-translate="logisticsOwn">Logística Spotlight (+10%)</span>
+                  <span id="invoice-logistics-cost">$0</span>
+                </div>
+                <div class="invoice-row">
+                  <span data-translate="commission">Comisión Spotlight (10%)</span>
+                  <span id="invoice-commission-cost">$0</span>
+                </div>
+                <div class="invoice-row total">
+                  <span>Total</span>
+                  <span id="invoice-total-cost">$0</span>
+                </div>
+              </div>
+
+              <!-- Action buttons -->
+              <button class="btn btn-gold btn-full" style="width: 100%; height: 50px; font-size: 16px;" onclick="app.proceedToCheckout()" data-translate="bookNow">
+                Reservar Ahora
+              </button>
+
+              <div style="margin-top: 16px; text-align: center;" id="whatsapp-field-contact">
+                <!-- If it's a sports field, we can show direct whatsapp as fallback option -->
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. CHECKOUT & PASARELA DE PAGO -->
+    <div id="view-checkout" class="view-container">
+      <div class="container checkout-container glass-panel animate-fade" style="margin-top: 40px;">
+        <h2 style="font-size: 32px; text-align: center; margin-bottom: 8px;" data-translate="checkoutTitle">Confirmar tu Reserva</h2>
+        <p style="color: var(--text-secondary); text-align: center; margin-bottom: 30px;">
+          Estás reservando <strong id="checkout-space-name">Lugar</strong> para la fecha <strong id="checkout-date">Fecha</strong>.
+        </p>
+
+        <!-- Billing Summary -->
+        <div style="border: 1px solid var(--border-color); padding: 20px; border-radius: var(--radius-md); background: var(--bg-primary); margin-bottom: 30px;">
+          <h4 style="margin-bottom: 12px;" data-translate="reviews">Resumen del Pago</h4>
+          <div style="display: flex; flex-direction: column; gap: 10px; font-size: 14px;">
+            <div style="display: flex; justify-content: space-between;">
+              <span>Alquiler de Espacio:</span>
+              <span id="checkout-base-price">$0</span>
+            </div>
+            <div style="display: flex; justify-content: space-between;" id="checkout-logistics-row">
+              <span>Servicio de Logística:</span>
+              <span id="checkout-logistics-price">$0</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; color: var(--text-secondary);">
+              <span>Comisión de la Plataforma (10%):</span>
+              <span id="checkout-commission-price">$0</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; border-top: 1px solid var(--border-color); padding-top: 10px; font-weight: 800; font-size: 16px; color: var(--accent-gold);">
+              <span>Total a Pagar:</span>
+              <span id="checkout-total-price">$0</span>
+            </div>
+          </div>
+        </div>
+
+        <h3 data-translate="paymentMethod">Selecciona Método de Pago</h3>
+        <div class="payment-methods-grid">
+          <div class="payment-method-card selected" id="pay-nequi" onclick="app.selectPaymentMethod('nequi')">
+            <span class="icon">📱</span>
+            <strong>Nequi</strong>
+            <span style="font-size: 10px; color: var(--text-muted);">Transferencia inmediata</span>
+          </div>
+          <div class="payment-method-card" id="pay-pse" onclick="app.selectPaymentMethod('pse')">
+            <span class="icon">🏦</span>
+            <strong>PSE (Débito)</strong>
+            <span style="font-size: 10px; color: var(--text-muted);">Cualquier banco col.</span>
+          </div>
+          <div class="payment-method-card" id="pay-card" onclick="app.selectPaymentMethod('card')">
+            <span class="icon">💳</span>
+            <strong>Tarjeta Visa / Master</strong>
+            <span style="font-size: 10px; color: var(--text-muted);">Nacional o Internacional</span>
+          </div>
+        </div>
+
+        <!-- Simulated inputs -->
+        <div id="payment-input-fields" style="margin-bottom: 30px;">
+          <div class="form-group" id="group-phone-nequi">
+            <label for="payment-phone">Número de Celular Nequi</label>
+            <input type="text" id="payment-phone" placeholder="Ej: 300 123 4567">
+          </div>
+          <div class="form-group" id="group-card-details" style="display:none;">
+            <label for="payment-card-num">Número de Tarjeta</label>
+            <input type="text" id="payment-card-num" placeholder="0000 0000 0000 0000">
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 16px;">
+          <button class="btn btn-secondary" style="flex:1;" onclick="app.navigateTo('detail')" data-translate="exploreBtn">Atrás</button>
+          <button class="btn btn-gold" style="flex:2;" onclick="app.processBookingPayment()" data-translate="payConfirm">Confirmar y Pagar</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4. LOGISTICS & EVENT CREATION FORM -->
+    <div id="view-logistics" class="view-container">
+      <div class="container" style="max-width: 750px; padding: 40px 0;">
+        <div class="glass-panel" style="padding: 40px; border-radius: var(--radius-lg);">
+          <h1 class="gold-text" style="font-size: 36px; margin-bottom: 12px; text-align: center;">Spotlight Events Logistics</h1>
+          <p style="text-align: center; color: var(--text-secondary); margin-bottom: 40px;">
+            ¿Tienes ya tu propio espacio pero necesitas un equipo premium de organización? Completa esta solicitud y coordinaremos sonido, decoración, catering, fotografía y logística completa.
+          </p>
+
+          <form id="logistics-request-form" onsubmit="app.submitLogisticsRequest(event)">
+            <div class="booking-input-row" style="margin-bottom: 20px;">
+              <div class="form-group">
+                <label for="log-name">Nombre Completo</label>
+                <input type="text" id="log-name" required placeholder="Ej: Brayan Sagan">
+              </div>
+              <div class="form-group">
+                <label for="log-phone">Celular de Contacto</label>
+                <input type="text" id="log-phone" required placeholder="Ej: 301 789 4512">
+              </div>
+            </div>
+
+            <div class="booking-input-row" style="margin-bottom: 20px;">
+              <div class="form-group">
+                <label for="log-event-type">Tipo de Evento</label>
+                <select id="log-event-type">
+                  <option value="boda">Boda o Aniversario</option>
+                  <option value="corporativo">Evento Corporativo / Conferencia</option>
+                  <option value="cumpleanos">Fiesta de Cumpleaños</option>
+                  <option value="torneo">Torneo Deportivo (Fútbol/Tenis)</option>
+                  <option value="otro">Otro tipo de montaje</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="log-guests">Invitados Estimados</label>
+                <input type="number" id="log-guests" min="10" max="1000" value="50">
+              </div>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 20px;">
+              <label for="log-address">Ubicación del Evento (Dirección o Nombre de la Finca/Espacio)</label>
+              <input type="text" id="log-address" required placeholder="Ej: Finca Las Palmas, Km 5 Vía al Mar">
+            </div>
+
+            <div class="form-group" style="margin-bottom: 30px;">
+              <label for="log-description">Cuéntanos tu visión del evento (Servicios específicos que deseas: Fotografía, Decoración, Catering, Luces...)</label>
+              <textarea id="log-description" rows="4" placeholder="Ej: Quiero una decoración estilo moderno en blanco, catering para 100 personas de comida de mar, sonido profesional y fotógrafo por 6 horas."></textarea>
+            </div>
+
+            <button type="submit" class="btn btn-gold btn-full" style="width: 100%; height: 52px; font-size: 16px;">
+              Enviar Solicitud de Cotización
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5. FAVORITES VIEW -->
+    <div id="view-favorites" class="view-container">
+      <div class="container" style="padding: 40px 0;">
+        <h1 style="font-size: 36px; margin-bottom: 8px;" class="gold-text" data-translate="favorites">Mis Lugares Favoritos</h1>
+        <p style="color: var(--text-secondary); margin-bottom: 40px;" data-translate="noFavorites">Los espacios a los que les des corazón aparecerán guardados aquí para acceso rápido.</p>
+        
+        <div class="listing-grid" id="favorites-grid-container">
+          <!-- Favorites card rendering -->
+        </div>
+      </div>
+    </div>
+
+    <!-- 6. HOST DASHBOARD -->
+    <div id="view-dashboard" class="view-container">
+      <div class="container dashboard-layout">
+        <div class="dashboard-header">
+          <div>
+            <h1 class="gold-text">Panel del Anfitrión</h1>
+            <p id="dashboard-host-welcome" style="color: var(--text-secondary);">Bienvenido de vuelta, Andrés</p>
+          </div>
+          <button class="btn btn-gold" onclick="app.openCreateSpaceModal()">
+            + <span data-translate="createSpace">Crear Nuevo Espacio</span>
+          </button>
+        </div>
+
+        <!-- Performance Stats -->
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-label" data-translate="visitorCount">Visitantes Únicos</div>
+            <div class="stat-value" id="host-stat-views">1,450</div>
+            <div class="stat-sub">▲ +12% este mes</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label" data-translate="revenue">Ingresos Totales</div>
+            <div class="stat-value" id="host-stat-earnings">$1.350.000 COP</div>
+            <div class="stat-sub">Spotlight 10% deducido</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label" data-translate="bookings">Reservas Activas</div>
+            <div class="stat-value" id="host-stat-bookings">8</div>
+            <div class="stat-sub">Próximos 30 días</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label" data-translate="rating">Calificación Promedio</div>
+            <div class="stat-value" id="host-stat-rating">★ 4.95</div>
+            <div class="stat-sub">Comentarios verificados</div>
+          </div>
+        </div>
+
+        <!-- Dashboard Layout Grid -->
+        <div class="dashboard-sections-grid">
+          <!-- Table of Spaces owned -->
+          <div class="dashboard-list-card">
+            <div class="list-header-row">
+              <h3 data-translate="exploreBtn">Mis Propiedades y Canchas</h3>
+            </div>
+            <table class="dashboard-table">
+              <thead>
+                <tr>
+                  <th data-translate="description">Espacio</th>
+                  <th data-translate="theme">Categoría</th>
+                  <th data-translate="pricePerHour">Precio/Hora</th>
+                  <th>Reservas</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody id="dashboard-spaces-tbody">
+                <!-- Loaded dynamically -->
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Views chart and recommendations -->
+          <div class="dashboard-list-card">
+            <h3 style="margin-bottom: 8px;">Visitas Semanales</h3>
+            <p style="font-size: 11px; color: var(--text-muted);">Estadísticas de visualización del perfil</p>
+            <div class="chart-container">
+              <div class="chart-bar-wrapper">
+                <div class="chart-bar" data-value="120" style="height: 40%;"></div>
+                <div class="chart-label">Lun</div>
+              </div>
+              <div class="chart-bar-wrapper">
+                <div class="chart-bar" data-value="150" style="height: 50%;"></div>
+                <div class="chart-label">Mar</div>
+              </div>
+              <div class="chart-bar-wrapper">
+                <div class="chart-bar" data-value="310" style="height: 90%;"></div>
+                <div class="chart-label">Mié</div>
+              </div>
+              <div class="chart-bar-wrapper">
+                <div class="chart-bar" data-value="200" style="height: 65%;"></div>
+                <div class="chart-label">Jue</div>
+              </div>
+              <div class="chart-bar-wrapper">
+                <div class="chart-bar" data-value="280" style="height: 80%;"></div>
+                <div class="chart-label">Vie</div>
+              </div>
+              <div class="chart-bar-wrapper">
+                <div class="chart-bar" data-value="350" style="height: 100%;"></div>
+                <div class="chart-label">Sáb</div>
+              </div>
+            </div>
+            
+            <div style="margin-top: 24px; padding: 16px; border-radius: var(--radius-sm); border: 1px dashed var(--accent-gold); font-size: 13px;">
+              <strong style="color: var(--accent-gold);">💡 Recomendación de Spotlight:</strong>
+              <p style="color: var(--text-secondary); margin-top: 4px;">
+                Los días miércoles y sábados registran tu mayor volumen de búsquedas. Considera ofrecer promociones o ampliar tus franjas horarias nocturnas para aumentar tus ventas.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 7. ADMIN PANEL -->
+    <div id="view-admin" class="view-container">
+      <div class="container dashboard-layout">
+        <div class="dashboard-header">
+          <div>
+            <h1 class="gold-text">Panel del Administrador (Sagan)</h1>
+            <p style="color: var(--text-secondary);">Supervisión de Transacciones, Soporte y Base de Datos del Sistema</p>
+          </div>
+        </div>
+
+        <!-- Global metrics -->
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-label">Comisiones Recaudadas (10%)</div>
+            <div class="stat-value" id="admin-stat-commissions">$0 COP</div>
+            <div class="stat-sub">Ingresos directos Spotlight</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Usuarios Registrados</div>
+            <div class="stat-value" id="admin-stat-users">0</div>
+            <div class="stat-sub">Clientes y Propietarios</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Locaciones Totales</div>
+            <div class="stat-value" id="admin-stat-spaces">0</div>
+            <div class="stat-sub">Activas en Barranquilla</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Reservas Procesadas</div>
+            <div class="stat-value" id="admin-stat-bookings">0</div>
+            <div class="stat-sub">Histórico total</div>
+          </div>
+        </div>
+
+        <div class="dashboard-sections-grid">
+          <!-- Transactions list -->
+          <div class="dashboard-list-card">
+            <h3 style="margin-bottom: 20px;">Historial de Transacciones</h3>
+            <table class="dashboard-table">
+              <thead>
+                <tr>
+                  <th>ID Reserva</th>
+                  <th>Cliente</th>
+                  <th>Espacio</th>
+                  <th>Monto Total</th>
+                  <th>Comisión (10%)</th>
+                </tr>
+              </thead>
+              <tbody id="admin-transactions-tbody">
+                <!-- Loaded dynamically -->
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Quick Actions & User lists -->
+          <div class="dashboard-list-card">
+            <h3 style="margin-bottom: 16px;">Soporte Técnico Activo</h3>
+            <div id="admin-tickets-container" style="display: flex; flex-direction: column; gap: 12px;">
+              <!-- Admin tickets list loaded dynamically -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 8. SUPPORT CHAT VIEW -->
+    <div id="view-support" class="view-container">
+      <div class="container" style="max-width: 600px; padding: 40px 0;">
+        <h1 class="gold-text" style="font-size: 32px; margin-bottom: 8px;" data-translate="support">Soporte Spotlight</h1>
+        <p style="color: var(--text-secondary); margin-bottom: 24px;">
+          ¿Tienes algún inconveniente con una reserva, pago o necesitas ayuda para registrar tu espacio? Chatea con nuestro equipo de atención (Sagan & Team) disponible 24/7.
+        </p>
+
+        <div class="chat-container glass-panel">
+          <div class="chat-header">
+            <div class="chat-avatar">S</div>
+            <div>
+              <strong style="display: block;">Soporte Spotlight</strong>
+              <span style="font-size: 11px; color: var(--accent-green);">● En línea</span>
+            </div>
+          </div>
+          <div class="chat-body" id="chat-body-container">
+            <div class="chat-bubble support">
+              ¡Hola! Soy Brayan Sainea (Sagan), líder de soporte técnico y desarrollo de Spotlight. ¿En qué podemos colaborarte hoy?
+            </div>
+          </div>
+          <div class="chat-footer">
+            <input type="text" class="chat-input" id="chat-user-input" placeholder="Escribe tu mensaje aquí..." onkeypress="app.handleChatKeyPress(event)">
+            <button class="btn btn-gold" onclick="app.sendChatMessage()">Enviar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 9. SENA PITCH PRESENTATION VIEW -->
+    <div id="view-presentation" class="view-container">
+      <div class="container presentation-container">
+        <div class="presentation-header">
+          <div>
+            <h1 class="gold-text">Presentación del Proyecto SENA</h1>
+            <p style="color: var(--text-secondary);">Propuesta Tecnológica - Colombo-Estadounidense</p>
+          </div>
+          <button class="btn btn-secondary" onclick="app.navigateTo('explore')">← Ir a la App</button>
+        </div>
+
+        <div class="presentation-slide-deck" id="presentation-slide-deck">
+          <div class="presentation-spotlight"></div>
+          <div class="presentation-floating-man">🕴️</div>
+          
+          <div class="slide-num" id="slide-num">01 / 05</div>
+          <div class="slide-logo">SPOTLIGHT</div>
+          
+          <div class="slide-content">
+            <h2 class="slide-title" id="slide-title">Título Diapositiva</h2>
+            <h3 class="slide-subtitle" id="slide-subtitle">Subtítulo</h3>
+            
+            <ul class="slide-bullets" id="slide-bullets">
+              <!-- Loaded via JS -->
+            </ul>
+            
+            <div class="slide-highlight" id="slide-highlight">
+              Destacado importante.
+            </div>
+          </div>
+        </div>
+
+        <div class="presentation-controls">
+          <button class="btn btn-secondary" onclick="app.prevSlide()">◀ Anterior</button>
+          <div class="presentation-dots" id="presentation-dots">
+            <!-- Dots loaded dynamically -->
+          </div>
+          <button class="btn btn-gold" onclick="app.nextSlide()">Siguiente ▶</button>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- AUTHENTICATION DIALOG (LOGIN MODAL) -->
+  <div class="modal-backdrop" id="modal-login">
+    <div class="modal-content">
+      <button class="modal-close" onclick="app.closeModal('login')">×</button>
+      <h2 class="modal-title" data-translate="login">Iniciar Sesión</h2>
+      
+      <form onsubmit="app.handleLogin(event)">
+        <div class="form-group">
+          <label for="login-email">Correo Electrónico</label>
+          <input type="email" id="login-email" required placeholder="correo@ejemplo.com">
+        </div>
+        <div class="form-group">
+          <label for="login-password">Contraseña</label>
+          <input type="password" id="login-password" required placeholder="••••••••">
+        </div>
+        
+        <button type="submit" class="btn btn-gold" style="width: 100%; height: 48px; margin-top: 10px;">
+          Ingresar
+        </button>
+      </form>
+
+      <div style="margin-top: 16px; text-align: center; font-size: 13px;">
+        ¿No tienes cuenta? <a href="#" onclick="app.switchAuthModal('register')" style="color: var(--accent-gold); font-weight: bold;" data-translate="register">Regístrate</a>
+      </div>
+
+      <!-- Quick Login buttons for SENA evaluation -->
+      <div class="quick-login-row">
+        <button class="btn-quick-login" onclick="app.quickLogin('user-client')">Cliente (Test)</button>
+        <button class="btn-quick-login" onclick="app.quickLogin('user-host')">Anfitrión (Andrés)</button>
+        <button class="btn-quick-login" onclick="app.quickLogin('user-admin')">Admin (Sagan)</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- AUTHENTICATION DIALOG (REGISTER MODAL) -->
+  <div class="modal-backdrop" id="modal-register">
+    <div class="modal-content" style="max-width: 520px;">
+      <button class="modal-close" onclick="app.closeModal('register')">×</button>
+      <h2 class="modal-title" data-translate="register">Crear Cuenta</h2>
+      
+      <form onsubmit="app.handleRegister(event)">
+        <div class="form-group">
+          <label for="reg-name">Nombre Completo</label>
+          <input type="text" id="reg-name" required placeholder="Ej: Juan Pérez">
+        </div>
+        <div class="form-group">
+          <label for="reg-email">Correo Electrónico</label>
+          <input type="email" id="reg-email" required placeholder="correo@ejemplo.com">
+        </div>
+        <div class="form-group">
+          <label for="reg-role">Tipo de Usuario</label>
+          <select id="reg-role">
+            <option value="client">Quiero reservar espacios / canchas</option>
+            <option value="host">Quiero publicar mis locaciones / canchas</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="reg-password">Contraseña</label>
+          <input type="password" id="reg-password" required placeholder="Mínimo 6 caracteres">
+        </div>
+
+        <div style="font-size: 11px; color: var(--text-secondary); margin-bottom: 20px;">
+          <input type="checkbox" id="reg-terms" required>
+          Al crear una cuenta, aceptas nuestras <a href="#" onclick="app.openTermsModal()" style="color: var(--accent-gold); text-decoration: underline;">Políticas de Privacidad y Condiciones de Servicio</a>.
+        </div>
+        
+        <button type="submit" class="btn btn-gold" style="width: 100%; height: 48px;">
+          Registrarse
+        </button>
+      </form>
+
+      <div style="margin-top: 16px; text-align: center; font-size: 13px;">
+        ¿Ya tienes cuenta? <a href="#" onclick="app.switchAuthModal('login')" style="color: var(--accent-gold); font-weight: bold;" data-translate="login">Inicia Sesión</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- TERMS AND CONDITIONS MODAL -->
+  <div class="modal-backdrop" id="modal-terms">
+    <div class="modal-content" style="max-width: 600px;">
+      <button class="modal-close" onclick="app.closeModal('terms')">×</button>
+      <h2 class="modal-title">Políticas y Condiciones</h2>
+      <div style="height: 300px; overflow-y: auto; font-size: 13px; color: var(--text-secondary); padding-right: 10px; display: flex; flex-direction: column; gap: 14px;">
+        <p><strong>1. OBJETO Y ALCANCE</strong></p>
+        <p>SPOTLIGHT actúa como una plataforma de intermediación (Marketplace) que conecta a propietarios de espacios físicos y complejos deportivos con organizadores de eventos en el territorio nacional e internacional.</p>
+        <p><strong>2. MODELO DE COMISIÓN Y PAGOS</strong></p>
+        <p>Por cada reserva exitosa realizada en la categoría de Salones, Rooftops y Quintas, SPOTLIGHT deducirá una comisión del diez por ciento (10%) sobre el valor bruto del alquiler. El restante noventa por ciento (90%) será transferido al propietario al finalizar la fecha reservada.</p>
+        <p><strong>3. CONTROL DE CONTACTOS Y WHATSAPP</strong></p>
+        <p>En la categoría de Canchas Deportivas, la plataforma podrá mostrar un canal de contacto directo de WhatsApp. Para compensar la intermediación y evitar la evasión de comisiones (bypass), SPOTLIGHT implementará a partir del segundo mes una tarifa de listado recurrente mensual acordada con el administrador de la cancha.</p>
+        <p><strong>4. LOGÍSTICA DE EVENTOS (SPOTLIGHT EVENTS)</strong></p>
+        <p>Los servicios adicionales de sonido, decoración, luces y logística prestados por la subdivisión Spotlight Events están sujetos a cotizaciones individuales basadas en el aforo, complejidad y requerimientos particulares de cada locación.</p>
+      </div>
+      <button class="btn btn-primary" onclick="app.closeModal('terms')" style="width: 100%; margin-top: 20px;">Aceptar y Cerrar</button>
+    </div>
+  </div>
+
+  <!-- HOST CRUD MODAL: CREATE/EDIT SPACE -->
+  <div class="modal-backdrop" id="modal-space-crud">
+    <div class="modal-content" style="max-width: 580px;">
+      <button class="modal-close" onclick="app.closeSpaceModal()">×</button>
+      <h2 class="modal-title" id="space-modal-title">Registrar Nuevo Espacio</h2>
+      
+      <form onsubmit="app.handleSpaceSubmit(event)" style="max-height: 450px; overflow-y: auto; padding-right: 10px;">
+        <input type="hidden" id="space-form-id">
+        
+        <div class="form-group">
+          <label for="space-name">Nombre Comercial del Espacio</label>
+          <input type="text" id="space-name" required placeholder="Ej: Salón Diamante Prado">
+        </div>
+
+        <div class="booking-input-row" style="margin-bottom: 20px;">
+          <div class="form-group">
+            <label for="space-type">Categoría</label>
+            <select id="space-type">
+              <option value="salon">Salón / Espacio de Evento</option>
+              <option value="cancha">Cancha de Fútbol / Deportes</option>
+              <option value="espacio">Quinta / Rooftop</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="space-price">Precio por Hora (COP)</label>
+            <input type="number" id="space-price" required min="10000" placeholder="Ej: 150000">
+          </div>
+        </div>
+
+        <div class="booking-input-row" style="margin-bottom: 20px;">
+          <div class="form-group">
+            <label for="space-capacity">Capacidad Máxima (personas)</label>
+            <input type="number" id="space-capacity" required min="2" placeholder="Ej: 100">
+          </div>
+          <div class="form-group">
+            <label for="space-image">URL de Imagen Principal</label>
+            <input type="url" id="space-image" required placeholder="https://images.unsplash.com/...">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="space-address">Dirección Completa (Barranquilla)</label>
+          <input type="text" id="space-address" required placeholder="Ej: Calle 82 #53-40, Alto Prado">
+        </div>
+
+        <div class="form-group">
+          <label for="space-description">Descripción detallada del espacio</label>
+          <textarea id="space-description" rows="3" required placeholder="Describe las medidas, comodidades, accesos y características clave del lugar..."></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="space-logistics">Opción de Logística de Eventos</label>
+          <select id="space-logistics">
+            <option value="both">Ofrecer ambas (Logística del dueño o Spotlight Events)</option>
+            <option value="spotlight">Obligatorio contratar logística de Spotlight Events</option>
+            <option value="own">Solo logística propia del anfitrión</option>
+          </select>
+        </div>
+
+        <!-- Amenities Checklist -->
+        <div class="form-group">
+          <label>Servicios Incluidos (Amenities)</label>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 13px; margin-top: 6px;">
+            <label><input type="checkbox" class="amenity-checkbox" value="Vista al río"> Vista al río</label>
+            <label><input type="checkbox" class="amenity-checkbox" value="Cocina"> Cocina</label>
+            <label><input type="checkbox" class="amenity-checkbox" value="Wifi"> Wifi</label>
+            <label><input type="checkbox" class="amenity-checkbox" value="Piscina"> Piscina</label>
+            <label><input type="checkbox" class="amenity-checkbox" value="Se permiten mascotas"> Se permiten mascotas</label>
+            <label><input type="checkbox" class="amenity-checkbox" value="TV"> TV</label>
+            <label><input type="checkbox" class="amenity-checkbox" value="Lavadora"> Lavadora</label>
+            <label><input type="checkbox" class="amenity-checkbox" value="Aire acondicionado"> Aire acondicionado</label>
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-gold btn-full" style="width: 100%; height: 48px; margin-top: 20px;">
+          Guardar Cambios
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Premium Footer -->
+  <footer>
+    <div class="container">
+      <p id="footer-text" data-translate="footerCopyright">© 2026 SPOTLIGHT. Todos los derechos reservados. Proyecto Colombo-Estadounidense. Barranquilla, Colombia.</p>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

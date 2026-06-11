@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Perfil — Spotlight Events</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>tailwind.config={theme:{extend:{colors:{spotlight:{black:'#050505',dark:'#111111',cyan:'#00E0FF',pink:'#FF007F'}}},fontFamily:{sans:['Outfit','sans-serif']}}}</script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/global-theme.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/canvas-confetti/1.9.2/confetti.browser.min.js"></script>
+</head>
+<body class="font-sans antialiased min-h-screen">
+
+    <!-- Navbar -->
+    <nav class="border-b border-white/10 bg-spotlight-dark/50 sticky top-0 z-50 backdrop-blur-md">
+        <div class="max-w-6xl mx-auto px-4 flex items-center justify-between h-16">
+            <a href="../index.html" class="font-bold tracking-tight text-lg">SPOTLIGHT <span class="text-spotlight-cyan text-sm font-normal">Events</span></a>
+            <div class="flex items-center gap-4">
+                <button onclick="toggleTheme()" class="btn-theme-toggle text-xl p-2 rounded-full hover:bg-white/10 transition-colors">🌙</button>
+                <a href="catalog.html" class="text-spotlight-cyan text-sm font-semibold hover:underline">Catálogo</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-6xl mx-auto px-4 py-10">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+
+            <!-- Sidebar Navegación -->
+            <aside class="md:col-span-1">
+                <div class="bg-spotlight-dark border border-white/10 rounded-2xl overflow-hidden">
+                    <!-- Avatar del usuario -->
+                    <div class="p-6 text-center border-b border-white/10">
+                        <div id="avatarCircle" class="w-20 h-20 rounded-full bg-gradient-to-tr from-spotlight-cyan to-spotlight-pink mx-auto flex items-center justify-center text-3xl font-bold text-black mb-3">B</div>
+                        <p id="profileName" class="font-bold text-lg">Usuario</p>
+                        <p id="profilePlan" class="text-xs text-spotlight-cyan mt-1 font-semibold">Plan Explorer</p>
+                    </div>
+
+                    <!-- Menú de navegación -->
+                    <nav class="p-3">
+                        <button onclick="mostrarSeccion('info')" id="nav-info" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left text-sm font-semibold transition-colors bg-spotlight-cyan/10 text-spotlight-cyan">
+                            <span class="text-lg">👤</span> Información personal
+                        </button>
+                        <button onclick="mostrarSeccion('reservas')" id="nav-reservas" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left text-sm font-semibold transition-colors text-gray-400 hover:text-white hover:bg-white/5 mt-1">
+                            <span class="text-lg">📋</span> Mis reservas
+                        </button>
+                        <button onclick="mostrarSeccion('logros')" id="nav-logros" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left text-sm font-semibold transition-colors text-gray-400 hover:text-white hover:bg-white/5 mt-1">
+                            <span class="text-lg">🏆</span> Mis logros
+                        </button>
+                        <button onclick="mostrarSeccion('seguridad')" id="nav-seguridad" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left text-sm font-semibold transition-colors text-gray-400 hover:text-white hover:bg-white/5 mt-1">
+                            <span class="text-lg">🔒</span> Seguridad
+                        </button>
+                        <button onclick="mostrarSeccion('metodos')" id="nav-metodos" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left text-sm font-semibold transition-colors text-gray-400 hover:text-white hover:bg-white/5 mt-1">
+                            <span class="text-lg">💳</span> Métodos de pago
+                        </button>
+                        <button onclick="mostrarSeccion('pref')" id="nav-pref" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left text-sm font-semibold transition-colors text-gray-400 hover:text-white hover:bg-white/5 mt-1">
+                            <span class="text-lg">⚙️</span> Preferencias
+                        </button>
+
+                        <div class="border-t border-white/10 mt-3 pt-3">
+                            <button onclick="salir()" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left text-sm font-semibold text-red-400 hover:bg-red-500/10 transition-colors">
+                                <span class="text-lg">🚪</span> Cerrar sesión
+                            </button>
+                        </div>
+                    </nav>
+                </div>
+            </aside>
+
+            <!-- Contenido principal -->
+            <div class="md:col-span-3">
+
+                <!-- SECCIÓN: Información Personal -->
+                <section id="sec-info" class="space-y-6">
+                    <div class="flex items-center justify-between mb-6">
+                        <h1 class="text-3xl font-bold">Información sobre mí</h1>
+                        <button onclick="guardarPerfil()" class="bg-spotlight-cyan hover:bg-cyan-400 text-black px-5 py-2 rounded-xl font-bold text-sm transition-colors">Guardar</button>
+                    </div>
+
+                    <!-- Foto de perfil con 4 imágenes -->
+                    <div class="bg-spotlight-dark border border-white/10 rounded-2xl p-6">
+                        <h2 class="font-bold mb-4">Foto de perfil</h2>
+                        <div class="flex items-center gap-6 flex-wrap">
+                            <div id="profileAvatar" class="w-24 h-24 rounded-full bg-gradient-to-tr from-spotlight-cyan to-spotlight-pink flex items-center justify-center text-4xl font-bold text-black overflow-hidden cursor-pointer hover:scale-105 transition-transform">
+                                <span id="avatarInitial">B</span>
+                            </div>
+                            <!-- Fotos de muestra para elegir -->
+                            <div class="flex gap-3 flex-wrap">
+                                <p class="w-full text-xs text-gray-500 mb-1">Elige un avatar o sube tu foto:</p>
+                                <button onclick="setAvatar('🧑‍💼')" class="w-14 h-14 rounded-full bg-blue-900 text-2xl flex items-center justify-center hover:ring-2 ring-spotlight-cyan transition-all">🧑‍💼</button>
+                                <button onclick="setAvatar('🧑‍🎤')" class="w-14 h-14 rounded-full bg-purple-900 text-2xl flex items-center justify-center hover:ring-2 ring-spotlight-cyan transition-all">🧑‍🎤</button>
+                                <button onclick="setAvatar('🧑‍🚀')" class="w-14 h-14 rounded-full bg-green-900 text-2xl flex items-center justify-center hover:ring-2 ring-spotlight-cyan transition-all">🧑‍🚀</button>
+                                <button onclick="setAvatar('🧑‍🎨')" class="w-14 h-14 rounded-full bg-red-900 text-2xl flex items-center justify-center hover:ring-2 ring-spotlight-cyan transition-all">🧑‍🎨</button>
+                                <label class="w-14 h-14 rounded-full bg-white/10 border border-dashed border-white/20 text-lg flex items-center justify-center cursor-pointer hover:border-spotlight-cyan transition-colors" title="Subir foto">
+                                    📸
+                                    <input type="file" accept="image/*" class="hidden" onchange="subirFoto(this)">
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Formulario de datos -->
+                    <div class="bg-spotlight-dark border border-white/10 rounded-2xl p-6 space-y-4">
+                        <h2 class="font-bold mb-2">Datos personales</h2>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs uppercase text-gray-500 mb-1">Nombre</label>
+                                <input id="editNombre" type="text" placeholder="Tu nombre" class="w-full bg-black border border-white/10 rounded-xl px-4 py-3 text-white outline-none focus:border-spotlight-cyan transition-colors">
+                            </div>
+                            <div>
+                                <label class="block text-xs uppercase text-gray-500 mb-1">Correo electrónico</label>
+                                <input id="editEmail" type="email" placeholder="correo@ejemplo.com" class="w-full bg-black border border-white/10 rounded-xl px-4 py-3 text-white outline-none focus:border-spotlight-cyan transition-colors" disabled>
+                            </div>
+                            <div>
+                                <label class="block text-xs uppercase text-gray-500 mb-1">Teléfono</label>
+                                <input id="editTel" type="tel" placeholder="+57 300 000 0000" class="w-full bg-black border border-white/10 rounded-xl px-4 py-3 text-white outline-none focus:border-spotlight-cyan transition-colors">
+                            </div>
+                            <div>
+                                <label class="block text-xs uppercase text-gray-500 mb-1">Ciudad</label>
+                                <input id="editCiudad" type="text" placeholder="Barranquilla" class="w-full bg-black border border-white/10 rounded-xl px-4 py-3 text-white outline-none focus:border-spotlight-cyan transition-colors">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-xs uppercase text-gray-500 mb-1">Sobre mí</label>
+                            <textarea id="editBio" rows="3" placeholder="Cuéntales a los anfitriones un poco sobre ti..." class="w-full bg-black border border-white/10 rounded-xl px-4 py-3 text-white outline-none focus:border-spotlight-cyan transition-colors resize-none"></textarea>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- SECCIÓN: Reservas -->
+                <section id="sec-reservas" class="hidden">
+                    <h1 class="text-3xl font-bold mb-6">Mis Reservas</h1>
+                    <div id="listaReservas" class="space-y-4"></div>
+                </section>
+
+                <!-- SECCIÓN: Logros -->
+                <section id="sec-logros" class="hidden">
+                    <h1 class="text-3xl font-bold mb-6">Mis Logros</h1>
+                    <div id="gamification-section-profile">Cargando...</div>
+                </section>
+
+                <!-- SECCIÓN: Seguridad -->
+                <section id="sec-seguridad" class="hidden">
+                    <h1 class="text-3xl font-bold mb-6">Seguridad</h1>
+                    
+                    <!-- Cambiar contraseña -->
+                    <div class="bg-spotlight-dark border border-white/10 rounded-2xl p-6 mb-6">
+                        <h2 class="font-bold text-lg mb-5">🔒 Cambiar Contraseña</h2>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-xs uppercase text-gray-500 mb-1">Contraseña actual</label>
+                                <input id="passActual" type="password" placeholder="Tu contraseña actual" class="w-full bg-black border border-white/10 rounded-xl px-4 py-3 text-white outline-none focus:border-spotlight-cyan transition-colors">
+                            </div>
+                            <div>
+                                <label class="block text-xs uppercase text-gray-500 mb-1">Nueva contraseña</label>
+                                <input id="passNueva" type="password" placeholder="Mínimo 6 caracteres" class="w-full bg-black border border-white/10 rounded-xl px-4 py-3 text-white outline-none focus:border-spotlight-cyan transition-colors">
+                            </div>
+                            <div>
+                                <label class="block text-xs uppercase text-gray-500 mb-1">Confirmar nueva contraseña</label>
+                                <input id="passConfirm" type="password" placeholder="Repite la nueva contraseña" class="w-full bg-black border border-white/10 rounded-xl px-4 py-3 text-white outline-none focus:border-spotlight-cyan transition-colors">
+                            </div>
+                            <button onclick="ejecutarCambioPass()" class="bg-spotlight-cyan hover:bg-cyan-400 text-black font-bold px-6 py-3 rounded-xl transition-all">
+                                Actualizar Contraseña
+                            </button>
+                            <p id="msgPass" class="text-sm hidden"></p>
+                        </div>
+                    </div>
+
+                    <!-- Otros -->
+                    <div class="bg-spotlight-dark border border-white/10 rounded-2xl p-6 space-y-4">
+                        <div class="flex items-center justify-between py-3 border-b border-white/10">
+                            <div><p class="font-semibold">Verificación en 2 pasos</p><p class="text-sm text-gray-400">Agrega una capa extra de seguridad</p></div>
+                            <button id="btn-2fa" onclick="toggle2FA()" class="bg-spotlight-cyan text-black px-4 py-2 rounded-xl text-sm font-bold transition-colors">Activar</button>
+                        </div>
+                        <div class="flex items-center justify-between py-3">
+                            <div><p class="font-semibold">Identidad verificada</p><p class="text-sm text-green-400">✓ Tu documento fue validado</p></div>
+                            <span class="text-spotlight-cyan font-bold text-sm">✓ Activo</span>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- SECCIÓN: Métodos de Pago -->
+                <section id="sec-metodos" class="hidden">
+                    <h1 class="text-3xl font-bold mb-6">Métodos de Pago</h1>
+                        <div id="lista-metodos" class="space-y-4">
+                            <div class="flex items-center gap-4 p-4 bg-white/5 rounded-xl border border-white/10">
+                                <span class="text-3xl">📱</span>
+                                <div><p class="font-bold">Nequi</p><p class="text-sm text-gray-400">•••• 1116</p></div>
+                                <span class="ml-auto text-green-400 text-xs font-bold">✓ Principal</span>
+                            </div>
+                        </div>
+                        <button onclick="toggleModalMetodo()" class="w-full bg-white/5 border border-dashed border-white/20 hover:border-spotlight-cyan text-gray-400 hover:text-white py-4 rounded-xl text-sm font-semibold transition-colors">
+                            + Agregar método de pago
+                        </button>
+
+                        <!-- Modal Agregar Método (Oculto) -->
+                        <div id="modalAddMetodo" class="hidden mt-4 p-4 bg-black border border-white/10 rounded-xl space-y-4">
+                            <h3 class="font-bold text-spotlight-cyan">Nueva Tarjeta</h3>
+                            <div>
+                                <label class="block text-xs uppercase text-gray-500 mb-1">Número de Tarjeta</label>
+                                <input id="newCardNum" type="text" placeholder="0000 0000 0000 0000" maxlength="19" class="w-full bg-spotlight-dark border border-white/10 rounded-lg px-3 py-2 text-white text-sm outline-none focus:border-spotlight-cyan">
+                            </div>
+                            <div class="grid grid-cols-2 gap-2">
+                                <div>
+                                    <label class="block text-xs uppercase text-gray-500 mb-1">MM/YY</label>
+                                    <input type="text" placeholder="12/26" maxlength="5" class="w-full bg-spotlight-dark border border-white/10 rounded-lg px-3 py-2 text-white text-sm outline-none focus:border-spotlight-cyan">
+                                </div>
+                                <div>
+                                    <label class="block text-xs uppercase text-gray-500 mb-1">CVC</label>
+                                    <input type="text" placeholder="123" maxlength="4" class="w-full bg-spotlight-dark border border-white/10 rounded-lg px-3 py-2 text-white text-sm outline-none focus:border-spotlight-cyan">
+                                </div>
+                            </div>
+                            <div class="flex gap-2">
+                                <button onclick="toggleModalMetodo()" class="flex-1 bg-white/10 text-white font-bold py-2 rounded-lg">Cancelar</button>
+                                <button onclick="agregarMetodo()" class="flex-1 bg-spotlight-cyan text-black font-bold py-2 rounded-lg">Guardar</button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- SECCIÓN: Preferencias -->
+                <section id="sec-pref" class="hidden">
+                    <h1 class="text-3xl font-bold mb-6">Preferencias</h1>
+                    <div class="bg-spotlight-dark border border-white/10 rounded-2xl p-6 space-y-6">
+                        <div class="flex items-center justify-between">
+                            <div><p class="font-semibold">Modo de visualización</p><p class="text-sm text-gray-400">Elige entre modo claro u oscuro</p></div>
+                            <button onclick="toggleTheme()" class="btn-theme-toggle bg-white/10 hover:bg-white/20 px-5 py-2 rounded-xl font-bold text-sm transition-colors flex items-center gap-2">🌙 Cambiar</button>
+                        </div>
+                        <div class="flex items-center justify-between border-t border-white/10 pt-4">
+                            <div><p class="font-semibold">Notificaciones por correo</p><p class="text-sm text-gray-400">Recibe confirmaciones y recordatorios</p></div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" checked class="sr-only peer">
+                                <div class="w-11 h-6 bg-gray-700 peer-checked:bg-spotlight-cyan rounded-full after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-5"></div>
+                            </label>
+                        </div>
+                        <div class="flex items-center justify-between border-t border-white/10 pt-4">
+                            <div><p class="font-semibold">Idioma</p><p class="text-sm text-gray-400">Idioma de la interfaz</p></div>
+                            <select class="bg-black border border-white/10 text-spotlight-cyan font-bold py-2 px-3 rounded-xl outline-none text-sm cursor-pointer">
+                                <option>🇨🇴 Español</option><option>🇺🇸 English</option><option>🇫🇷 Français</option>
+                            </select>
+                        </div>
+                    </div>
+                </section>
+
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-white/10 py-8 text-center text-gray-500 text-sm mt-10">
+        <div class="flex justify-center items-center gap-6 mb-4 flex-wrap">
+            <a href="https://www.instagram.com/sagan.xs/" target="_blank" rel="noopener" class="flex items-center gap-2 text-gray-400 hover:text-spotlight-pink transition-colors group">
+                <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+                @sagan.xs
+            </a>
+            <a href="https://play.google.com/store" target="_blank" class="flex items-center gap-2 bg-black hover:bg-white/10 border border-white/10 px-4 py-2 rounded-xl text-white font-semibold text-sm transition-colors">
+                ▶ Descarga la App
+            </a>
+        </div>
+        <p>© 2026 Spotlight Events — Desarrollado por Brayan Sainea (Sagan).</p>
+    </footer>
+
+    <script type="module">
+        import { inicializarTema } from '../js/components/theme.js';
+        import { renderInsignias, simularReservasDemo, verificarInsignias, lanzarConfeti } from '../js/services/gamification.js';
+        import { cambiarContrasena, recuperarContrasena } from '../js/services/auth.js';
+        
+        inicializarTema();
+        
+        const user = JSON.parse(localStorage.getItem('spotlight_user'));
+        if (!user) { window.location.href = 'login.html'; }
+        else {
+            // Rellenar datos
+            document.getElementById('avatarInitial').textContent = (user.nombre || 'U')[0].toUpperCase();
+            document.getElementById('avatarCircle').textContent = (user.nombre || 'U')[0].toUpperCase();
+            document.getElementById('profileName').textContent = user.nombre || 'Usuario';
+            document.getElementById('profilePlan').textContent = `Plan ${user.plan || 'Explorer'}`;
+            document.getElementById('editNombre').value = user.nombre || '';
+            document.getElementById('editEmail').value = user.email || '';
+            document.getElementById('editTel').value = user.tel || '';
+            document.getElementById('editCiudad').value = user.ciudad || 'Barranquilla';
+            document.getElementById('editBio').value = user.bio || '';
+        }
+
+        // Reservas
+        const historial = JSON.parse(localStorage.getItem('bookingHistory') || '[]');
+        const listaReservas = document.getElementById('listaReservas');
+        if (historial.length > 0) {
+            listaReservas.innerHTML = historial.reverse().map(r => `
+                <div class="bg-spotlight-dark border border-white/10 rounded-2xl p-5 flex items-center justify-between gap-4">
+                    <div>
+                        <p class="font-bold">${r.spaceId || 'Espacio Spotlight'}</p>
+                        <p class="text-sm text-gray-400">${new Date(r.date).toLocaleDateString('es-CO', {day:'2-digit',month:'long',year:'numeric'})}</p>
+                    </div>
+                    <div class="text-right">
+                        <p class="font-bold text-spotlight-cyan">$${(r.amount||0).toLocaleString('es-CO')} COP</p>
+                        <span class="text-xs ${r.status==='completada'?'text-green-400':'text-yellow-400'} font-semibold">${r.status||'completada'}</span>
+                    </div>
+                </div>
+            `).join('');
+        } else {
+            listaReservas.innerHTML = `<div class="text-center py-10 text-gray-500"><p class="text-5xl mb-3">📋</p><p>Aún no tienes reservas.</p><a href="catalog.html" class="text-spotlight-cyan hover:underline text-sm">Explorar espacios →</a></div>`;
+        }
+
+        // Logros
+        simularReservasDemo();
+        verificarInsignias();
+        renderInsignias('gamification-section-profile');
+
+        window.guardarPerfil = () => {
+            const user = JSON.parse(localStorage.getItem('spotlight_user'));
+            user.nombre = document.getElementById('editNombre').value;
+            user.tel = document.getElementById('editTel').value;
+            user.ciudad = document.getElementById('editCiudad').value;
+            user.bio = document.getElementById('editBio').value;
+            localStorage.setItem('spotlight_user', JSON.stringify(user));
+            document.getElementById('profileName').textContent = user.nombre;
+            document.getElementById('avatarInitial').textContent = (user.nombre||'U')[0].toUpperCase();
+            document.getElementById('avatarCircle').textContent = (user.nombre||'U')[0].toUpperCase();
+            if(typeof confetti !== 'undefined') confetti({particleCount:60,spread:60,origin:{y:0.3},colors:['#00E0FF','#FF007F']});
+        };
+
+        window.setAvatar = (emoji) => {
+            document.getElementById('profileAvatar').innerHTML = `<span style="font-size:2.5rem">${emoji}</span>`;
+            document.getElementById('avatarCircle').textContent = emoji;
+        };
+
+        window.subirFoto = (input) => {
+            const file = input.files[0];
+            if(!file) return;
+            const reader = new FileReader();
+            reader.onload = e => {
+                document.getElementById('profileAvatar').innerHTML = `<img src="${e.target.result}" class="w-full h-full object-cover">`;
+                document.getElementById('avatarCircle').innerHTML = `<img src="${e.target.result}" class="w-full h-full object-cover rounded-full">`;
+            };
+            reader.readAsDataURL(file);
+        };
+
+        window.salir = () => {
+            localStorage.removeItem('spotlight_user');
+            window.location.href = '../index.html';
+        };
+
+        window.ejecutarCambioPass = async () => {
+            const actual = document.getElementById('passActual').value;
+            const nueva = document.getElementById('passNueva').value;
+            const confirma = document.getElementById('passConfirm').value;
+            const msg = document.getElementById('msgPass');
+            msg.classList.remove('hidden');
+            if (!actual || !nueva) { msg.className = 'text-sm text-red-400'; msg.textContent = 'Completa todos los campos.'; return; }
+            if (nueva !== confirma) { msg.className = 'text-sm text-red-400'; msg.textContent = 'Las contraseñas nuevas no coinciden.'; return; }
+            if (nueva.length < 6) { msg.className = 'text-sm text-red-400'; msg.textContent = 'La nueva contraseña debe tener al menos 6 caracteres.'; return; }
+            msg.className = 'text-sm text-gray-400'; msg.textContent = 'Actualizando...';
+            const result = await cambiarContrasena(actual, nueva);
+            if (result.success) {
+                msg.className = 'text-sm text-green-400';
+                msg.textContent = '✅ ' + result.message;
+                document.getElementById('passActual').value = '';
+                document.getElementById('passNueva').value = '';
+                document.getElementById('passConfirm').value = '';
+            } else {
+                msg.className = 'text-sm text-red-400';
+                msg.textContent = '❌ ' + result.error;
+            }
+        };
+
+        window.mostrarSeccion = (id) => {
+            document.querySelectorAll('[id^="sec-"]').forEach(s => s.classList.add('hidden'));
+            document.querySelectorAll('[id^="nav-"]').forEach(b => {
+                b.classList.remove('bg-spotlight-cyan/10','text-spotlight-cyan');
+                b.classList.add('text-gray-400');
+            });
+            document.getElementById('sec-'+id).classList.remove('hidden');
+            const navBtn = document.getElementById('nav-'+id);
+            if(navBtn) { navBtn.classList.add('bg-spotlight-cyan/10','text-spotlight-cyan'); navBtn.classList.remove('text-gray-400'); }
+        };
+    </script>
+    <script>
+        window.toggleTheme = () => {
+            document.body.classList.toggle('light-mode');
+            const isLight = document.body.classList.contains('light-mode');
+            localStorage.setItem('spotlight_theme', isLight ? 'light' : 'dark');
+            document.querySelectorAll('.btn-theme-toggle').forEach(b => b.textContent = (isLight?'☀️':'🌙') + (b.textContent.length > 2 ? ' Cambiar' : ''));
+        };
+        if(localStorage.getItem('spotlight_theme')==='light'){
+            document.body.classList.add('light-mode');
+            setTimeout(()=>document.querySelectorAll('.btn-theme-toggle').forEach(b=>{if(b.textContent.includes('🌙'))b.textContent=b.textContent.replace('🌙','☀️');}), 100);
+        }
+        // Lógica de 2FA
+        const is2FA = localStorage.getItem('spotlight_2fa') === 'true';
+        const btn2FA = document.getElementById('btn-2fa');
+        if(is2FA) {
+            btn2FA.textContent = 'Desactivar';
+            btn2FA.classList.replace('bg-spotlight-cyan', 'bg-white/10');
+            btn2FA.classList.replace('text-black', 'text-white');
+        }
+        window.toggle2FA = () => {
+            const current = localStorage.getItem('spotlight_2fa') === 'true';
+            if(!current) {
+                // Activar
+                const pin = prompt('Ingresa un número de celular para enviar tu código de seguridad de 6 dígitos:');
+                if(pin && pin.length >= 10) {
+                    localStorage.setItem('spotlight_2fa', 'true');
+                    btn2FA.textContent = 'Desactivar';
+                    btn2FA.classList.replace('bg-spotlight-cyan', 'bg-white/10');
+                    btn2FA.classList.replace('text-black', 'text-white');
+                    alert('Verificación en dos pasos activada exitosamente. Tu cuenta está segura.');
+                }
+            } else {
+                // Desactivar
+                if(confirm('¿Estás seguro de desactivar la seguridad extra en tu cuenta?')) {
+                    localStorage.setItem('spotlight_2fa', 'false');
+                    btn2FA.textContent = 'Activar';
+                    btn2FA.classList.replace('bg-white/10', 'bg-spotlight-cyan');
+                    btn2FA.classList.replace('text-white', 'text-black');
+                }
+            }
+        };
+
+        // Lógica de Agregar Método de Pago
+        window.toggleModalMetodo = () => {
+            document.getElementById('modalAddMetodo').classList.toggle('hidden');
+        };
+        window.agregarMetodo = () => {
+            const cardNum = document.getElementById('newCardNum').value.replace(/\s+/g,'');
+            if(cardNum.length < 15) {
+                alert('Ingresa un número de tarjeta válido.'); return;
+            }
+            const last4 = cardNum.slice(-4);
+            const html = `
+                <div class="flex items-center gap-4 p-4 bg-white/5 rounded-xl border border-white/10 mt-2">
+                    <span class="text-3xl">💳</span>
+                    <div><p class="font-bold">Tarjeta</p><p class="text-sm text-gray-400">•••• ${last4}</p></div>
+                    <button class="ml-auto text-red-400 text-xs font-bold hover:text-red-300" onclick="this.parentElement.remove()">Eliminar</button>
+                </div>
+            `;
+            document.getElementById('lista-metodos').insertAdjacentHTML('beforeend', html);
+            document.getElementById('newCardNum').value = '';
+            toggleModalMetodo();
+            alert('¡Método de pago agregado correctamente!');
+        };
+    </script>
+</body>
+</html>

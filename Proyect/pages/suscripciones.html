@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Suscripciones VIP — Spotlight Events</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: { extend: { colors: { spotlight: { black: '#050505', dark: '#111111', cyan: '#00E0FF', pink: '#FF007F' } } }, fontFamily: { sans: ['Outfit', 'sans-serif'] } }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <!-- Tema global -->
+    <link rel="stylesheet" href="../css/global-theme.css">
+    <!-- Confetti -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/canvas-confetti/1.9.2/confetti.browser.min.js"></script>
+    <!-- Google Translate -->
+    <script>function googleTranslateElementInit(){new google.translate.TranslateElement({pageLanguage:'es',includedLanguages:'en,fr,pt'},document.createElement('div'));}</script>
+    <script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+    <style>
+        /* Modal de pago SIEMPRE oscuro o se adaptará según se prefiera, pero dejaremos que global-theme.css lo maneje */
+        #modalPagoContent {
+            transition: transform 0.3s ease;
+        }
+    </style>
+</head>
+<body class="font-sans antialiased min-h-screen relative overflow-x-hidden">
+
+    <!-- Background glow -->
+    <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[500px] bg-spotlight-cyan/10 blur-[150px] rounded-full pointer-events-none -z-10"></div>
+
+    <!-- Navbar -->
+    <nav class="border-b border-white/10 bg-spotlight-dark/50 sticky top-0 z-50 backdrop-blur-md">
+        <div class="max-w-7xl mx-auto px-4 flex items-center justify-between h-16">
+            <a href="../index.html" class="font-bold tracking-tight text-lg">SPOTLIGHT <span class="text-spotlight-cyan text-sm font-normal">Events</span></a>
+            <div class="flex items-center gap-4">
+                <select id="langSel" onchange="changeLang(this.value)" class="bg-spotlight-dark border border-white/10 text-spotlight-cyan font-bold py-1.5 px-3 rounded-lg outline-none text-sm cursor-pointer">
+                    <option value="es">🇨🇴 ES</option><option value="en">🇺🇸 EN</option><option value="pt">🇧🇷 PT</option>
+                </select>
+                <button onclick="toggleTheme()" class="btn-theme-toggle text-xl p-1.5 rounded-full hover:bg-white/10 transition-colors">🌙</button>
+                <a href="catalog.html" class="text-gray-400 hover:text-white transition-colors font-semibold">Ir al Catálogo</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Header -->
+    <main class="max-w-7xl mx-auto px-4 py-16 text-center">
+        <span class="inline-block py-1 px-3 rounded-full bg-white/5 border border-white/10 text-xs font-semibold text-spotlight-cyan tracking-wide mb-4">
+            Spotlight VIP
+        </span>
+        <h1 class="text-4xl md:text-6xl font-bold mb-4">Lleva tus eventos al <span class="text-transparent bg-clip-text bg-gradient-to-r from-spotlight-cyan to-blue-500">siguiente nivel</span></h1>
+        <p class="text-xl text-gray-400 max-w-2xl mx-auto mb-16">Elige el plan que mejor se adapte a ti y comienza a ahorrar miles de pesos en todas tus reservas hoy mismo.</p>
+
+        <!-- Pricing Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto text-left">
+            
+            <!-- PLAN 1: Explorer -->
+            <div class="pricing-card bg-spotlight-dark border border-white/10 rounded-3xl p-8 flex flex-col hover:border-white/20 transition-colors">
+                <h3 class="text-2xl font-bold mb-2">Explorer</h3>
+                <div class="flex items-end gap-1 mb-4">
+                    <span class="text-4xl font-bold">Gratis</span>
+                    <span class="text-gray-500 text-sm mb-1">/ siempre</span>
+                </div>
+                <p class="text-gray-400 text-sm mb-8">Para explorar sin compromisos.</p>
+                <ul class="space-y-4 mb-8 flex-1 text-sm text-gray-300">
+                    <li class="flex items-start gap-3"><span class="text-green-500">✓</span> Reservas sin costo extra</li>
+                    <li class="flex items-start gap-3"><span class="text-green-500">✓</span> Mapa de espacios cercanos</li>
+                    <li class="flex items-start gap-3"><span class="text-green-500">✓</span> Favoritos ilimitados</li>
+                    <li class="flex items-start gap-3"><span class="text-green-500">✓</span> Reseñas y calificaciones</li>
+                    <li class="flex items-start gap-3"><span class="text-green-500">✓</span> Modo oscuro / claro</li>
+                </ul>
+                <button class="w-full bg-white/5 border border-white/10 text-white font-bold py-3 rounded-xl cursor-default">Plan Actual</button>
+            </div>
+
+            <!-- PLAN 2: Premium -->
+            <div class="pricing-card pricing-card-premium bg-[#0A1A24] border border-spotlight-cyan rounded-3xl p-8 flex flex-col relative transform md:-translate-y-4 shadow-[0_0_40px_rgba(0,224,255,0.15)]">
+                <div class="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-spotlight-cyan text-black text-xs font-bold px-4 py-1 rounded-full uppercase tracking-wider">Más Popular</div>
+                <h3 class="text-2xl font-bold mb-2 text-spotlight-cyan">Premium</h3>
+                <div class="flex items-end gap-1 mb-4">
+                    <span class="text-4xl font-bold">$29.900</span>
+                    <span class="text-gray-500 text-sm mb-1">COP / mes</span>
+                </div>
+                <p class="text-gray-400 text-sm mb-8">Para quienes reservan seguido.</p>
+                <ul class="space-y-4 mb-8 flex-1 text-sm text-gray-300">
+                    <li class="flex items-start gap-3 font-bold text-white"><span class="text-spotlight-cyan">⚡</span> 15% descuento en todos los salones</li>
+                    <li class="flex items-start gap-3 font-bold text-white"><span class="text-spotlight-cyan">⚡</span> 10% descuento en canchas</li>
+                    <li class="flex items-start gap-3"><span class="text-green-500">✓</span> Acceso prioritario a nuevos espacios</li>
+                    <li class="flex items-start gap-3"><span class="text-green-500">✓</span> Soporte 24/7 prioritario</li>
+                    <li class="flex items-start gap-3"><span class="text-green-500">✓</span> Hasta 3 torneos al mes</li>
+                    <li class="flex items-start gap-3"><span class="text-green-500">✓</span> Historial de reservas extendido</li>
+                </ul>
+                <div class="bg-spotlight-cyan/10 border border-spotlight-cyan/20 p-3 rounded-lg mb-6 text-center text-xs text-spotlight-cyan font-semibold">
+                    Si reservas 3+ veces al mes, ya te sale a cuenta 🎯
+                </div>
+                <button onclick="abrirPasarela('Premium', 29900)" class="w-full bg-spotlight-cyan hover:bg-cyan-400 text-black font-bold py-3 rounded-xl transition-colors shadow-[0_0_20px_rgba(0,224,255,0.3)]">
+                    Suscribirme
+                </button>
+            </div>
+
+            <!-- PLAN 3: Élite -->
+            <div class="pricing-card bg-spotlight-dark border border-white/10 rounded-3xl p-8 flex flex-col hover:border-yellow-500/30 transition-colors relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-20 h-20 bg-gradient-to-bl from-yellow-500/20 to-transparent"></div>
+                <h3 class="text-2xl font-bold mb-2">Élite</h3>
+                <div class="flex items-end gap-1 mb-4">
+                    <span class="text-4xl font-bold">$79.900</span>
+                    <span class="text-gray-500 text-sm mb-1">COP / mes</span>
+                </div>
+                <p class="text-gray-400 text-sm mb-8">Para organizadores y empresas.</p>
+                <ul class="space-y-4 mb-8 flex-1 text-sm text-gray-300">
+                    <li class="flex items-start gap-3 font-bold text-white"><span class="text-yellow-500">⚡</span> 20% descuento en espacios</li>
+                    <li class="flex items-start gap-3 font-bold text-white"><span class="text-yellow-500">⚡</span> 15% descuento en canchas</li>
+                    <li class="flex items-start gap-3 font-bold text-white"><span class="text-yellow-500">⚡</span> 1 org. de evento incluida / trimestre</li>
+                    <li class="flex items-start gap-3"><span class="text-green-500">✓</span> Asesor personal de eventos</li>
+                    <li class="flex items-start gap-3"><span class="text-green-500">✓</span> Panel corporativo</li>
+                    <li class="flex items-start gap-3"><span class="text-green-500">✓</span> Facturación electrónica</li>
+                    <li class="flex items-start gap-3"><span class="text-green-500">✓</span> Torneos ilimitados</li>
+                </ul>
+                <div class="bg-yellow-500/10 border border-yellow-500/20 p-3 rounded-lg mb-6 text-center text-xs text-yellow-500 font-semibold">
+                    Un solo evento corporativo y ya recuperaste el año 💼
+                </div>
+                <button onclick="abrirPasarela('Élite', 79900)" class="w-full bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-400 hover:to-orange-400 text-black font-bold py-3 rounded-xl transition-all shadow-[0_0_20px_rgba(234,179,8,0.3)]">
+                    Ver Élite 👑
+                </button>
+            </div>
+        </div>
+
+        <div class="mt-16 text-center text-gray-500 text-sm">
+            Pagos 100% seguros procesados a través de:
+            <div class="flex justify-center items-center gap-6 mt-4 font-bold text-gray-400">
+                <span>Wompi</span><span>Nequi</span><span>PSE</span><span>Bancolombia</span>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal Pasarela de Pago -->
+    <div id="modalPago" class="fixed inset-0 bg-black/80 backdrop-blur-md z-[100] flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300">
+        <div id="modalPagoContent" class="bg-spotlight-dark border border-white/10 w-full max-w-md mx-4 rounded-2xl shadow-2xl transform scale-95 transition-transform duration-300 overflow-hidden">
+            <!-- Header del Modal -->
+            <div id="pagoHeader" class="p-6 border-b border-white/10 flex items-center justify-between">
+                <div>
+                    <h3 class="text-xl font-bold">Pago Seguro</h3>
+                    <p id="pagoSubtitle" class="text-gray-400 text-sm">Plan Premium — $29.900 COP/mes</p>
+                </div>
+                <button onclick="cerrarPasarela()" class="text-gray-400 hover:text-white transition-colors">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+
+            <!-- Métodos de Pago (Tabs) -->
+            <div class="flex border-b border-white/10">
+                <button onclick="setTab('nequi')" id="tab-nequi" class="flex-1 py-3 text-sm font-bold border-b-2 border-spotlight-cyan text-spotlight-cyan transition-colors">📱 Nequi</button>
+                <button onclick="setTab('pse')" id="tab-pse" class="flex-1 py-3 text-sm font-semibold border-b-2 border-transparent text-gray-400 hover:text-white transition-colors">🏦 PSE</button>
+                <button onclick="setTab('tarjeta')" id="tab-tarjeta" class="flex-1 py-3 text-sm font-semibold border-b-2 border-transparent text-gray-400 hover:text-white transition-colors">💳 Tarjeta</button>
+            </div>
+
+            <!-- Contenido según Tab -->
+            <div class="p-6">
+                <!-- Nequi -->
+                <div id="form-nequi" class="space-y-4">
+                    <div>
+                        <label class="block text-xs uppercase text-gray-500 mb-1">Número de Celular (Nequi)</label>
+                        <input type="tel" placeholder="310 000 0000" maxlength="10" class="w-full bg-black border border-white/10 rounded-xl px-4 py-3 text-white outline-none focus:border-spotlight-cyan text-lg font-mono">
+                    </div>
+                    <p class="text-xs text-gray-500 flex items-center gap-2">🔒 Recibirás una notificación push en tu app Nequi para confirmar el pago.</p>
+                </div>
+
+                <!-- PSE -->
+                <div id="form-pse" class="space-y-4 hidden">
+                    <div>
+                        <label class="block text-xs uppercase text-gray-500 mb-1">Banco</label>
+                        <select class="w-full bg-black border border-white/10 rounded-xl px-4 py-3 text-white outline-none focus:border-spotlight-cyan">
+                            <option>Bancolombia</option><option>Davivienda</option><option>BBVA</option>
+                            <option>Banco de Bogotá</option><option>Scotiabank Colpatria</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs uppercase text-gray-500 mb-1">Tipo de Persona</label>
+                        <select class="w-full bg-black border border-white/10 rounded-xl px-4 py-3 text-white outline-none focus:border-spotlight-cyan">
+                            <option>Natural</option><option>Jurídica</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Tarjeta -->
+                <div id="form-tarjeta-pago" class="space-y-4 hidden">
+                    <div>
+                        <label class="block text-xs uppercase text-gray-500 mb-1">Número de Tarjeta</label>
+                        <input type="text" placeholder="0000 0000 0000 0000" maxlength="19" class="w-full bg-black border border-white/10 rounded-xl px-4 py-3 text-white outline-none focus:border-spotlight-cyan font-mono">
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs uppercase text-gray-500 mb-1">Vencimiento</label>
+                            <input type="text" placeholder="MM/YY" maxlength="5" class="w-full bg-black border border-white/10 rounded-xl px-4 py-3 text-white outline-none focus:border-spotlight-cyan font-mono">
+                        </div>
+                        <div>
+                            <label class="block text-xs uppercase text-gray-500 mb-1">CVC</label>
+                            <input type="text" placeholder="•••" maxlength="4" class="w-full bg-black border border-white/10 rounded-xl px-4 py-3 text-white outline-none focus:border-spotlight-cyan font-mono">
+                        </div>
+                    </div>
+                    <p class="text-xs text-spotlight-cyan flex items-center gap-1">🔒 Tu tarjeta es procesada de forma encriptada por Wompi</p>
+                </div>
+            </div>
+
+            <!-- Desglose y Botón Pagar -->
+            <div class="px-6 pb-6 space-y-4">
+                <div class="bg-white/5 rounded-xl p-4 text-sm space-y-2 border border-white/10">
+                    <div class="flex justify-between text-gray-400"><span>Plan</span><span id="pagoDesglosePlan" class="text-white font-bold">Premium</span></div>
+                    <div class="flex justify-between text-gray-400"><span>Renovación</span><span>Mensual automática</span></div>
+                    <div class="flex justify-between text-gray-400 border-t border-white/10 pt-2"><span class="font-bold text-white">Total hoy</span><span id="pagoDesgloseTotal" class="text-spotlight-cyan font-bold text-lg">$29.900</span></div>
+                </div>
+                <button onclick="confirmarPago()" class="w-full bg-spotlight-cyan hover:bg-cyan-400 text-black font-bold py-4 rounded-xl text-lg transition-all shadow-[0_0_20px_rgba(0,224,255,0.3)]">
+                    Pagar ahora 🔒
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer con Instagram y App -->
+    <footer class="border-t border-white/10 py-8 text-center text-gray-500 text-sm mt-8">
+        <div class="flex justify-center items-center gap-6 mb-4 flex-wrap">
+            <a href="https://www.instagram.com/sagan.xs/" target="_blank" rel="noopener" class="flex items-center gap-2 text-gray-400 hover:text-spotlight-pink transition-colors group">
+                <svg class="w-5 h-5 fill-current group-hover:text-spotlight-pink" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+                <span>@sagan.xs</span>
+            </a>
+            <a href="https://play.google.com/store" target="_blank" class="flex items-center gap-2 bg-black hover:bg-white/10 border border-white/10 px-4 py-2 rounded-xl text-white font-semibold text-sm transition-colors">
+                <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M3,20.5v-17c0-0.83,0.94-1.3,1.6-0.8l14,8.5c0.6,0.37,0.6,1.23,0,1.6l-14,8.5C3.94,21.8,3,21.33,3,20.5z"/></svg>
+                Descarga la App
+            </a>
+        </div>
+        <p>© 2026 Spotlight Events — Desarrollado por Brayan Sainea (Sagan).</p>
+    </footer>
+
+    <script>
+        let planActual = 'Premium', precioActual = 29900;
+
+        function abrirPasarela(plan, precio) {
+            const user = JSON.parse(localStorage.getItem('spotlight_user'));
+            if(!user) {
+                alert('Debes iniciar sesión para suscribirte.');
+                window.location.href = 'login.html';
+                return;
+            }
+            planActual = plan; precioActual = precio;
+            document.getElementById('pagoSubtitle').textContent = `Plan ${plan} — $${precio.toLocaleString('es-CO')} COP/mes`;
+            document.getElementById('pagoDesglosePlan').textContent = plan;
+            document.getElementById('pagoDesgloseTotal').textContent = '$' + precio.toLocaleString('es-CO');
+
+            const modal = document.getElementById('modalPago');
+            const content = document.getElementById('modalPagoContent');
+            modal.classList.remove('opacity-0','pointer-events-none');
+            content.classList.remove('scale-95');
+        }
+
+        function cerrarPasarela() {
+            document.getElementById('modalPago').classList.add('opacity-0','pointer-events-none');
+            document.getElementById('modalPagoContent').classList.add('scale-95');
+        }
+
+        function setTab(tab) {
+            ['nequi','pse','tarjeta-pago'].forEach(t => {
+                document.getElementById('form-'+t)?.classList.add('hidden');
+            });
+            ['nequi','pse','tarjeta'].forEach(t => {
+                const btn = document.getElementById('tab-'+t);
+                if(btn) { btn.classList.remove('border-spotlight-cyan','text-spotlight-cyan'); btn.classList.add('border-transparent','text-gray-400'); }
+            });
+            document.getElementById('form-'+(tab==='tarjeta'?'tarjeta-pago':tab))?.classList.remove('hidden');
+            const activeBtn = document.getElementById('tab-'+tab);
+            if(activeBtn) { activeBtn.classList.add('border-spotlight-cyan','text-spotlight-cyan'); activeBtn.classList.remove('border-transparent','text-gray-400'); }
+        }
+
+        function confirmarPago() {
+            // Validar campos según la pestaña activa
+            const activeTab = document.querySelector('[id^="tab-"].border-spotlight-cyan').id.replace('tab-', '');
+            let valid = true;
+            
+            if (activeTab === 'nequi') {
+                const input = document.querySelector('#form-nequi input');
+                if(input.value.length < 10) valid = false;
+            } else if (activeTab === 'tarjeta') {
+                const inputs = document.querySelectorAll('#form-tarjeta-pago input');
+                inputs.forEach(input => { if(input.value.length < 3) valid = false; });
+            }
+
+            if(!valid) {
+                alert('Por favor completa todos los datos de pago correctamente.');
+                return;
+            }
+
+            const btn = document.querySelector('button[onclick="confirmarPago()"]');
+            btn.textContent = 'Procesando pago... ⏳';
+            btn.disabled = true;
+
+            setTimeout(() => {
+                const user = JSON.parse(localStorage.getItem('spotlight_user'));
+                user.plan = planActual;
+                localStorage.setItem('spotlight_user', JSON.stringify(user));
+
+                cerrarPasarela();
+                if(typeof confetti !== 'undefined') {
+                    confetti({particleCount:200,spread:90,origin:{y:0.6},colors:['#00E0FF','#FF007F','#FFD700']});
+                }
+                
+                btn.textContent = 'Pagar ahora 🔒';
+                btn.disabled = false;
+
+                setTimeout(() => {
+                    alert(`🎉 ¡Pago exitoso! Ya eres usuario ${planActual}. Tus descuentos están activos.`);
+                    window.location.href = 'catalog.html';
+                }, 1200);
+            }, 1500);
+        }
+
+        // Tema y Idioma
+        window.toggleTheme = () => {
+            document.body.classList.toggle('light-mode');
+            const isLight = document.body.classList.contains('light-mode');
+            localStorage.setItem('spotlight_theme','isLight' ? 'light' : 'dark');
+            document.querySelector('.btn-theme-toggle').textContent = isLight ? '☀️' : '🌙';
+        };
+        if(localStorage.getItem('spotlight_theme')==='light') {
+            document.body.classList.add('light-mode');
+            const btn = document.querySelector('.btn-theme-toggle');
+            if(btn) btn.textContent = '☀️';
+        }
+
+        function changeLang(lang) {
+            const sel = document.querySelector('.goog-te-combo');
+            if(sel){sel.value=lang;sel.dispatchEvent(new Event('change'));}
+        }
+    </script>
+</body>
+</html>

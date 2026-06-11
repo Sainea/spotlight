@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalles del Espacio — Spotlight</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: { extend: { colors: { spotlight: { black: '#050505', dark: '#111111', cyan: '#00E0FF', pink: '#FF007F' } } }, fontFamily: { sans: ['Outfit', 'sans-serif'] } }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        body { background-color: #050505; color: #F9F6F0; }
+        .glass-card { background: rgba(17, 17, 17, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.1); }
+        .sticky-card { position: sticky; top: 6rem; }
+    </style>
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+</head>
+<body class="font-sans antialiased min-h-screen pb-20">
+
+    <!-- Navbar -->
+    <nav class="border-b border-white/10 bg-spotlight-dark/50 sticky top-0 z-50 backdrop-blur-md">
+        <div class="max-w-7xl mx-auto px-4 flex items-center justify-between h-16">
+            <a href="catalog.html" class="flex items-center gap-2 text-gray-400 hover:text-white transition-colors">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                Volver al Catálogo
+            </a>
+            <button id="btnFavorito" class="flex items-center gap-2 text-gray-400 hover:text-spotlight-pink transition-colors font-semibold">
+                <span class="text-xl" id="corazon">🤍</span> Guardar
+            </button>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 py-8 opacity-0 transition-opacity duration-500" id="mainContent">
+        
+        <!-- Header -->
+        <div class="mb-6">
+            <h1 class="text-4xl md:text-5xl font-bold mb-2" id="sp-nombre">Cargando...</h1>
+            <div class="flex flex-wrap items-center gap-4 text-sm font-semibold text-gray-400">
+                <span class="flex items-center gap-1 text-white">⭐ <span id="sp-estrellas">0.0</span></span>
+                <span>•</span>
+                <span id="sp-resenas-count" class="underline">0 reseñas</span>
+                <span>•</span>
+                <span id="sp-barrio">Ubicación</span>
+            </div>
+        </div>
+
+        <!-- Galería (Hero Image) -->
+        <div class="w-full h-64 md:h-[500px] rounded-2xl overflow-hidden mb-12 relative group">
+            <img id="sp-imagen" src="" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" alt="Espacio">
+            <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+            <div class="absolute bottom-4 left-4 bg-spotlight-cyan text-black px-3 py-1 rounded font-bold text-sm uppercase tracking-wider" id="sp-categoria">Categoría</div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-12 relative">
+            
+            <!-- Left Column: Detalles -->
+            <div class="lg:col-span-2 space-y-10">
+                
+                <!-- Host Info -->
+                <div class="flex items-center justify-between pb-8 border-b border-white/10 cursor-pointer group" onclick="window.location.href='host_profile.html'">
+                    <div>
+                        <h2 class="text-2xl font-bold mb-1 group-hover:text-spotlight-cyan transition-colors">Publicado por Anfitrión Verificado</h2>
+                        <p class="text-gray-400 text-sm" id="sp-host">contacto@spotlight.co</p>
+                    </div>
+                    <div class="w-14 h-14 rounded-full bg-gradient-to-tr from-spotlight-cyan to-blue-500 flex items-center justify-center text-xl font-bold shadow-[0_0_15px_rgba(0,224,255,0.4)] group-hover:scale-110 transition-transform">
+                        👤
+                    </div>
+                </div>
+
+                <!-- Descripción -->
+                <div class="pb-8 border-b border-white/10">
+                    <h2 class="text-2xl font-bold mb-4">Acerca de este espacio</h2>
+                    <p class="text-gray-300 leading-relaxed" id="sp-descripcion">
+                        Descripción no disponible.
+                    </p>
+                </div>
+
+                <!-- Amenidades -->
+                <div class="pb-8 border-b border-white/10">
+                    <h2 class="text-2xl font-bold mb-6">¿Qué incluye este lugar?</h2>
+                    <ul class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-gray-300" id="sp-incluye">
+                        <!-- Generado por JS -->
+                    </ul>
+                </div>
+
+                <!-- Reseñas -->
+                <div class="pb-8 border-b border-white/10">
+                    <h2 class="text-2xl font-bold mb-6 flex items-center gap-2">
+                        ⭐ <span id="sp-estrellas-title">0.0</span> (<span id="sp-resenas-count-title">0</span> reseñas)
+                    </h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="sp-resenas">
+                        <!-- Generado por JS -->
+                    </div>
+                </div>
+
+                <!-- Ubicación (Mapa Leaflet) -->
+                <div>
+                    <h2 class="text-2xl font-bold mb-6">Dónde estarás</h2>
+                    <p class="text-gray-400 mb-4" id="sp-map-address">Barranquilla, Colombia</p>
+                    <div id="map" class="w-full h-80 rounded-2xl z-0 border border-white/10"></div>
+                </div>
+            </div>
+
+            <!-- Right Column: Tarjeta Fija de Reserva -->
+            <div class="relative">
+                <div class="glass-card rounded-2xl p-6 shadow-2xl sticky-card">
+                    <div class="mb-6">
+                        <div id="sp-ahorro-badge" class="hidden mb-2 inline-block text-[10px] font-bold uppercase px-2 py-1 rounded bg-spotlight-cyan text-black"></div>
+                        <div id="sp-precio-original" class="hidden text-sm text-gray-500 line-through mb-1">Antes $0</div>
+                        <p class="text-3xl font-bold text-spotlight-cyan inline-block" id="sp-precio">$0</p>
+                        <p class="text-gray-400 text-sm inline-block">COP / hora</p>
+                    </div>
+
+                    <div class="border border-white/20 rounded-xl overflow-hidden mb-6">
+                        <div class="p-3 border-b border-white/20">
+                            <label class="block text-xs uppercase font-bold text-gray-400 mb-1">Fecha</label>
+                            <input type="date" id="sp-fecha" style="color-scheme: dark;" class="w-full bg-transparent text-white outline-none focus:text-spotlight-cyan cursor-pointer" onclick="try{this.showPicker()}catch(e){}">
+                        </div>
+                        <div class="p-3">
+                            <label class="block text-xs uppercase font-bold text-gray-400 mb-1">Horario</label>
+                            <select id="sp-horario" class="w-full bg-transparent text-white outline-none focus:text-spotlight-cyan cursor-pointer">
+                                <option class="text-black" value="">Selecciona un horario</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Métodos de Pago -->
+                    <div class="border border-white/20 rounded-xl p-3 mb-6 transition-all duration-300">
+                        <label class="block text-xs uppercase font-bold text-gray-400 mb-2">Método de Pago</label>
+                        <div class="grid grid-cols-2 gap-2 mb-3">
+                            <label id="lbl-nequi" class="border border-spotlight-cyan bg-spotlight-cyan/10 rounded-lg p-2 flex flex-col items-center cursor-pointer transition-colors" onclick="toggleTarjeta(false)">
+                                <input type="radio" name="metodoPago" value="Nequi" class="hidden" checked>
+                                <span class="text-lg mb-1">📱</span><span class="font-bold text-xs text-white">Nequi / Wompi</span>
+                            </label>
+                            <label id="lbl-tarjeta" class="border border-white/10 bg-black hover:border-white/30 rounded-lg p-2 flex flex-col items-center cursor-pointer transition-colors" onclick="toggleTarjeta(true)">
+                                <input type="radio" name="metodoPago" value="Tarjeta" class="hidden">
+                                <span class="text-lg mb-1">💳</span><span class="font-bold text-xs text-gray-400">Tarjeta</span>
+                            </label>
+                        </div>
+
+                        <!-- Formulario Tarjeta Oculto -->
+                        <div id="form-tarjeta" class="hidden space-y-3 mt-4 border-t border-white/10 pt-3 transition-all">
+                            <div>
+                                <label class="block text-[10px] uppercase text-gray-500 mb-1">Número de Tarjeta</label>
+                                <input type="text" placeholder="0000 0000 0000 0000" class="w-full bg-black border border-white/10 rounded-lg px-3 py-2 text-white text-sm outline-none focus:border-spotlight-cyan" maxlength="19">
+                            </div>
+                            <div class="grid grid-cols-2 gap-2">
+                                <div>
+                                    <label class="block text-[10px] uppercase text-gray-500 mb-1">Vencimiento</label>
+                                    <input type="text" placeholder="MM/YY" class="w-full bg-black border border-white/10 rounded-lg px-3 py-2 text-white text-sm outline-none focus:border-spotlight-cyan" maxlength="5">
+                                </div>
+                                <div>
+                                    <label class="block text-[10px] uppercase text-gray-500 mb-1">CVC</label>
+                                    <input type="text" placeholder="123" class="w-full bg-black border border-white/10 rounded-lg px-3 py-2 text-white text-sm outline-none focus:border-spotlight-cyan" maxlength="4">
+                                </div>
+                            </div>
+                            <p class="text-[10px] text-spotlight-cyan flex items-center gap-1 mt-2">🔒 Procesado seguro por Wompi</p>
+                        </div>
+                    </div>
+
+                    <button onclick="procesarPago()" class="w-full bg-spotlight-cyan hover:bg-cyan-400 text-black font-bold text-lg py-4 rounded-xl shadow-[0_0_20px_rgba(0,224,255,0.3)] transition-transform transform hover:scale-105">
+                        Continuar al Pago
+                    </button>
+                    
+                    <p class="text-center text-xs text-gray-500 mt-4">No se te cobrará ningún cargo aún. Serás redirigido a la pasarela segura.</p>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <script type="module">
+        import { obtenerTodosLosEspacios } from '../js/services/db.js';
+        import { getUsuarioActual } from '../js/services/auth.js';
+        import { inicializarTema } from '../js/components/theme.js';
+        import { showToast } from '../js/components/toast.js';
+        import { agregarReserva, verificarInsignias, lanzarConfeti } from '../js/services/gamification.js';
+
+        inicializarTema();
+
+        // Obtener el ID de la URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const spaceId = urlParams.get('id');
+
+        if (!spaceId) {
+            window.location.href = 'catalog.html';
+        }
+
+        async function cargarEspacio() {
+            // Buscamos en todos los espacios (ya sea desde Firebase o Caché)
+            const todos = await obtenerTodosLosEspacios();
+            const espacio = todos.find(e => e.id === spaceId);
+
+            if (!espacio) {
+                alert("Espacio no encontrado");
+                window.location.href = 'catalog.html';
+                return;
+            }
+
+            // Pintar Datos
+            document.getElementById('sp-nombre').textContent = espacio.nombre;
+            document.getElementById('sp-barrio').textContent = espacio.barrio || 'Barranquilla';
+            document.getElementById('sp-imagen').src = espacio.imagen || 'https://images.unsplash.com/photo-1575361204480-aadea25e6e68';
+            document.getElementById('sp-categoria').textContent = espacio.categoria;
+            document.getElementById('sp-host').textContent = espacio.hostEmail || 'Anfitrión Local';
+            document.getElementById('sp-precio').textContent = '$' + (espacio.precioPorHora || 80000).toLocaleString('es-CO');
+            
+            // Datos enriquecidos
+            document.getElementById('sp-descripcion').textContent = espacio.descripcion || 'Este es un excelente espacio disponible para tus eventos deportivos o reuniones sociales en Barranquilla.';
+            
+            // Lógica de Suscripciones (Descuentos)
+            let userPlan = 'Explorer';
+            const currentU = getUsuarioActual();
+            if(currentU && currentU.plan) userPlan = currentU.plan;
+
+            let precioOriginal = espacio.precioPorHora || 80000;
+            let precioFinal = precioOriginal;
+            let esCancha = (espacio.categoria === 'Cancha Deportiva' || espacio.tipo === 'Cancha Deportiva');
+            
+            const badgeAhorro = document.getElementById('sp-ahorro-badge');
+            const lblOriginal = document.getElementById('sp-precio-original');
+
+            if (userPlan === 'Premium') {
+                let descuento = esCancha ? 0.10 : 0.15;
+                precioFinal = precioOriginal * (1 - descuento);
+                badgeAhorro.textContent = `Tu Plan Premium te ahorra $${(precioOriginal - precioFinal).toLocaleString('es-CO')} por hora ✨`;
+                badgeAhorro.classList.remove('hidden');
+                badgeAhorro.classList.replace('bg-spotlight-cyan', 'bg-spotlight-cyan');
+                lblOriginal.textContent = `Antes $${precioOriginal.toLocaleString('es-CO')}`;
+                lblOriginal.classList.remove('hidden');
+            } else if (userPlan === 'Élite') {
+                let descuento = esCancha ? 0.15 : 0.20;
+                precioFinal = precioOriginal * (1 - descuento);
+                badgeAhorro.textContent = `Tu Plan Élite te ahorra $${(precioOriginal - precioFinal).toLocaleString('es-CO')} por hora 👑`;
+                badgeAhorro.classList.remove('hidden');
+                badgeAhorro.classList.replace('bg-spotlight-cyan', 'bg-yellow-500');
+                lblOriginal.textContent = `Antes $${precioOriginal.toLocaleString('es-CO')}`;
+                lblOriginal.classList.remove('hidden');
+            }
+
+            document.getElementById('sp-precio').textContent = '$' + precioFinal.toLocaleString('es-CO');
+
+            const estrellas = espacio.estrellas || 4.5;
+            document.getElementById('sp-estrellas').textContent = estrellas;
+            document.getElementById('sp-estrellas-title').textContent = estrellas;
+
+            const resenas = espacio.resenas || [];
+            document.getElementById('sp-resenas-count').textContent = resenas.length + ' reseñas';
+            document.getElementById('sp-resenas-count-title').textContent = resenas.length;
+
+            const incluye = espacio.incluye || ['Buena iluminación', 'Acceso rápido', 'Atención personalizada'];
+            document.getElementById('sp-incluye').innerHTML = incluye.map(item => `
+                <li class="flex items-center gap-3">
+                    <span class="text-spotlight-cyan">✓</span>
+                    <span>${item}</span>
+                </li>
+            `).join('');
+
+            if (resenas.length > 0) {
+                document.getElementById('sp-resenas').innerHTML = resenas.map(r => `
+                    <div class="bg-white/5 border border-white/10 p-4 rounded-xl">
+                        <div class="flex items-center gap-3 mb-2">
+                            <div class="w-8 h-8 bg-gray-700 rounded-full flex items-center justify-center text-xs font-bold">${r.autor.charAt(0)}</div>
+                            <span class="font-bold">${r.autor}</span>
+                        </div>
+                        <p class="text-sm text-gray-400">"${r.comentario}"</p>
+                    </div>
+                `).join('');
+            } else {
+                document.getElementById('sp-resenas').innerHTML = `<p class="text-gray-500">Aún no hay reseñas para este espacio.</p>`;
+            }
+
+            // Mostrar el contenido con animación
+            document.getElementById('mainContent').classList.remove('opacity-0');
+            
+            // Lógica de Favoritos (LocalStorage)
+            manejarFavorito();
+
+            // Lógica del Mapa (Leaflet)
+            if(espacio.lat && espacio.lng) {
+                document.getElementById('sp-map-address').textContent = espacio.barrio || 'Barranquilla, Colombia';
+                const isLight = document.body.classList.contains('light-mode');
+                const tileUrl = isLight
+                    ? 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png'
+                    : 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png';
+                const map = L.map('map').setView([espacio.lat, espacio.lng], 15);
+                const tileLayer = L.tileLayer(tileUrl, {
+                    attribution: '&copy; OpenStreetMap &copy; CARTO',
+                    subdomains: 'abcd',
+                    maxZoom: 20
+                }).addTo(map);
+                
+                L.marker([espacio.lat, espacio.lng]).addTo(map);
+                
+                // Forzar recalibración del mapa para arreglar cuadros grises
+                setTimeout(() => {
+                    map.invalidateSize();
+                }, 500);
+                // Cambiar tiles cuando el usuario cambia el tema
+                document.body.addEventListener('themeChanged', () => {
+                    const newIsLight = document.body.classList.contains('light-mode');
+                    tileLayer.setUrl(newIsLight 
+                        ? 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png'
+                        : 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
+                    );
+                });
+
+                // Custom Marker
+                const markerHtmlStyles = `
+                    background-color: #00E0FF;
+                    width: 3rem;
+                    height: 3rem;
+                    display: block;
+                    left: -1.5rem;
+                    top: -1.5rem;
+                    position: relative;
+                    border-radius: 3rem 3rem 0;
+                    transform: rotate(45deg);
+                    border: 2px solid #000;
+                    box-shadow: 0 0 15px rgba(0,224,255,0.6);
+                `;
+                const icon = L.divIcon({
+                    className: "my-custom-pin",
+                    iconAnchor: [0, 24],
+                    labelAnchor: [-6, 0],
+                    popupAnchor: [0, -36],
+                    html: `<span style="${markerHtmlStyles}">
+                             <span style="transform: rotate(-45deg); display: block; width: 100%; height: 100%; text-align: center; line-height: 3rem; font-size: 1.2rem;">📍</span>
+                           </span>`
+                });
+
+                L.marker([espacio.lat, espacio.lng], {icon: icon}).addTo(map)
+                    .bindPopup(`<b>${espacio.nombre}</b><br>Haz clic para navegar.`)
+                    .openPopup();
+            } else {
+                // Coordenadas de Barranquilla por defecto (zona centro-norte)
+                const bqCoords = [
+                    [10.9685, -74.7813], [10.9900, -74.8083], [11.0041, -74.8070],
+                    [10.9500, -74.7900], [11.0200, -74.7700], [10.9750, -74.8200]
+                ];
+                const randomCoord = bqCoords[Math.floor(Math.random() * bqCoords.length)];
+                const isLightFb = document.body.classList.contains('light-mode');
+                const tileUrlFb = isLightFb
+                    ? 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png'
+                    : 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png';
+                const mapFallback = L.map('map', { zoomControl: true }).setView(randomCoord, 15);
+                const tileFb = L.tileLayer(tileUrlFb, { maxZoom: 19, attribution: '&copy; OpenStreetMap &copy; CARTO', subdomains: 'abcd' }).addTo(mapFallback);
+                document.body.addEventListener('themeChanged', () => {
+                    const nl = document.body.classList.contains('light-mode');
+                    tileFb.setUrl(nl ? 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png' : 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png');
+                });
+                const markerHtmlStyles2 = `background-color: #00E0FF; width: 3rem; height: 3rem; display: block; left: -1.5rem; top: -1.5rem; position: relative; border-radius: 3rem 3rem 0; transform: rotate(45deg); border: 2px solid #fff;`;
+                const icon2 = L.divIcon({ className: 'my-custom-pin', iconAnchor: [0, 24], popupAnchor: [0, -36], html: `<span style="${markerHtmlStyles2}"><span style="transform:rotate(-45deg);display:block;width:100%;height:100%;text-align:center;line-height:3rem;font-size:1.2rem;">📍</span></span>` });
+                L.marker(randomCoord, { icon: icon2 }).addTo(mapFallback).bindPopup(`<b>${espacio?.nombre || 'Espacio'}</b><br>Barranquilla, Colombia`).openPopup();
+            }
+
+            // Generación de Horarios Dinámicos
+            const selectHorario = document.getElementById('sp-horario');
+            const inputFecha = document.getElementById('sp-fecha');
+            
+            // Establecer fecha mínima a hoy
+            const hoy = new Date().toISOString().split('T')[0];
+            inputFecha.min = hoy;
+
+            let opcionesHTML = '<option value="" class="text-black">Selecciona un horario</option>';
+
+            if (esCancha) {
+                // Horas de 6am a 11pm
+                for (let i = 6; i <= 23; i++) {
+                    const horaInicio = i > 12 ? `${i-12}:00 PM` : (i === 12 ? `12:00 PM` : `${i}:00 AM`);
+                    let horaFin = (i+1) > 12 ? `${(i+1)-12}:00 PM` : ((i+1) === 12 ? `12:00 PM` : `${i+1}:00 AM`);
+                    if(i+1 === 24) horaFin = '12:00 AM'; // Edge case
+                    opcionesHTML += `<option value="${i}" class="text-black">${horaInicio} - ${horaFin}</option>`;
+                }
+            } else {
+                // Eventos
+                opcionesHTML += `<option value="mañana" class="text-black">Mañana (6:00 AM - 12:00 PM)</option>`;
+                opcionesHTML += `<option value="tarde_noche" class="text-black">Tarde / Noche (12:00 PM - 12:00 AM)</option>`;
+            }
+            selectHorario.innerHTML = opcionesHTML;
+
+            // Simulación de Disponibilidad
+            inputFecha.addEventListener('change', () => {
+                if (!inputFecha.value) return;
+                
+                // Reiniciar a "Disponible"
+                Array.from(selectHorario.options).forEach(opt => {
+                    if(opt.value !== "") {
+                        opt.disabled = false;
+                        opt.textContent = opt.textContent.replace(' (Ocupado)', '');
+                        opt.classList.replace('text-gray-400', 'text-black');
+                    }
+                });
+
+                // Bloquear aleatoriamente 30% de los slots como ocupados (usando la fecha como semilla sencilla)
+                const charCode = inputFecha.value.charCodeAt(inputFecha.value.length - 1);
+                Array.from(selectHorario.options).forEach((opt, index) => {
+                    if (opt.value !== "") {
+                        // Pseudo random
+                        if ((charCode + index * 7) % 3 === 0) {
+                            opt.disabled = true;
+                            opt.textContent += ' (Ocupado)';
+                            opt.classList.replace('text-black', 'text-gray-400');
+                        }
+                    }
+                });
+                
+                // Si el seleccionado se ocupó, deseleccionar
+                if (selectHorario.selectedOptions[0] && selectHorario.selectedOptions[0].disabled) {
+                    selectHorario.value = "";
+                }
+            });
+
+        }
+
+        function manejarFavorito() {
+            const btnFav = document.getElementById('btnFavorito');
+            const corazon = document.getElementById('corazon');
+            let favs = JSON.parse(localStorage.getItem('spotlight_favoritos') || '[]');
+            
+            const esFavorito = favs.includes(spaceId);
+            if(esFavorito) corazon.textContent = '❤️';
+
+            btnFav.addEventListener('click', () => {
+                favs = JSON.parse(localStorage.getItem('spotlight_favoritos') || '[]');
+                if (favs.includes(spaceId)) {
+                    favs = favs.filter(id => id !== spaceId);
+                    corazon.textContent = '🤍';
+                } else {
+                    favs.push(spaceId);
+                    corazon.textContent = '❤️';
+                    // Animación de pop
+                    corazon.classList.add('scale-150');
+                    setTimeout(() => corazon.classList.remove('scale-150'), 200);
+                }
+                localStorage.setItem('spotlight_favoritos', JSON.stringify(favs));
+            });
+        }
+
+        window.toggleTarjeta = (mostrar) => {
+            const form = document.getElementById('form-tarjeta');
+            const lblNequi = document.getElementById('lbl-nequi');
+            const lblTarjeta = document.getElementById('lbl-tarjeta');
+
+            if(mostrar) {
+                form.classList.remove('hidden');
+                lblTarjeta.classList.replace('border-white/10', 'border-spotlight-cyan');
+                lblTarjeta.classList.replace('bg-black', 'bg-spotlight-cyan/10');
+                lblTarjeta.querySelector('span.text-xs').classList.replace('text-gray-400', 'text-white');
+                lblNequi.classList.replace('border-spotlight-cyan', 'border-white/10');
+                lblNequi.classList.replace('bg-spotlight-cyan/10', 'bg-black');
+                lblNequi.querySelector('span.text-xs').classList.replace('text-white', 'text-gray-400');
+            } else {
+                form.classList.add('hidden');
+                lblNequi.classList.replace('border-white/10', 'border-spotlight-cyan');
+                lblNequi.classList.replace('bg-black', 'bg-spotlight-cyan/10');
+                lblNequi.querySelector('span.text-xs').classList.replace('text-gray-400', 'text-white');
+                lblTarjeta.classList.replace('border-spotlight-cyan', 'border-white/10');
+                lblTarjeta.classList.replace('bg-spotlight-cyan/10', 'bg-black');
+                lblTarjeta.querySelector('span.text-xs').classList.replace('text-white', 'text-gray-400');
+            }
+        }
+
+        window.procesarPago = () => {
+            const user = getUsuarioActual();
+            if(!user) {
+                showToast('Debes iniciar sesión para reservar', 'error');
+                setTimeout(() => window.location.href = 'login.html', 1500);
+                return;
+            }
+
+            const inputFecha = document.getElementById('sp-fecha').value;
+            const selectHorario = document.getElementById('sp-horario').value;
+            if(!inputFecha || !selectHorario) {
+                showToast('Por favor selecciona una fecha y horario para continuar', 'error');
+                return;
+            }
+
+            // Validar tarjeta si está seleccionada
+            const isTarjeta = !document.getElementById('form-tarjeta').classList.contains('hidden');
+            if (isTarjeta) {
+                const inputs = document.getElementById('form-tarjeta').querySelectorAll('input');
+                let valid = true;
+                inputs.forEach(input => { if(input.value.length < 3) valid = false; });
+                if(!valid) {
+                    showToast('Por favor, ingresa los datos completos de tu tarjeta de prueba.', 'error');
+                    return;
+                }
+            }
+            
+            const btn = document.querySelector('button[onclick="procesarPago()"]');
+            btn.textContent = 'Procesando pago... ⏳';
+            btn.disabled = true;
+
+            // Obtener precio actual
+            const precioTexto = document.getElementById('sp-precio').textContent.replace(/[^0-9]/g,'');
+            const precioBase = parseInt(precioTexto) || 200000;
+            // Prueba de descuento 10%
+            const descuento = Math.round(precioBase * 0.10);
+            const total = precioBase - descuento;
+            const comisionSpotlight = Math.round(total * 0.10);
+            const paraAnfitrion = total - comisionSpotlight;
+            
+            setTimeout(() => {
+                showToast(`
+                    💳 Desglose de pago:<br>
+                    Costo Original: $${precioBase.toLocaleString('es-CO')}<br>
+                    <strong>Descuento VIP (10%): -$${descuento.toLocaleString('es-CO')}</strong><br>
+                    <hr class="border-white/20 my-1">
+                    <strong>Tú pagas: $${total.toLocaleString('es-CO')}</strong><br>
+                    <span class="text-[10px] text-gray-400">El anfitrión recibe: $${paraAnfitrion.toLocaleString('es-CO')}</span>
+                `, 'info', 7000);
+
+                // Simular reserva completada y verificar insignias
+                setTimeout(() => {
+                    const nuevasInsignias = agregarReserva(spaceId, total);
+                    btn.textContent = '¡Pago Exitoso! ✅';
+                    btn.classList.replace('bg-spotlight-cyan', 'bg-green-500');
+                    btn.classList.replace('hover:bg-cyan-400', 'hover:bg-green-400');
+                    btn.classList.replace('text-black', 'text-white');
+                    showToast('¡Reserva confirmada! El dinero ha sido procesado.', 'success', 5000);
+                
+                    if(nuevasInsignias.length > 0) {
+                        nuevasInsignias.forEach((badge, i) => {
+                            setTimeout(() => {
+                                showToast(`🏆 ¡Insignia desbloqueada! ${badge.emoji} ${badge.nombre}`, 'badge', 5000);
+                                lanzarConfeti();
+                            }, i * 1000);
+                        });
+                    }
+                }, 4000); // Inner timeout closes here (4 sec after the first)
+            }, 2000); // Outer timeout closes here
+        }
+
+        cargarEspacio();
+    </script>
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <script>
+        // Theme toggle con evento para que el mapa reaccione
+        window.toggleTheme = () => {
+            document.body.classList.toggle('light-mode');
+            const isLight = document.body.classList.contains('light-mode');
+            localStorage.setItem('spotlight_theme', isLight ? 'light' : 'dark');
+            document.querySelectorAll('.btn-theme-toggle').forEach(b => b.textContent = isLight ? '☀️' : '🌙');
+            document.body.dispatchEvent(new CustomEvent('themeChanged'));
+        };
+        if(localStorage.getItem('spotlight_theme')==='light'){
+            document.body.classList.add('light-mode');
+            setTimeout(()=>document.querySelectorAll('.btn-theme-toggle').forEach(b=>b.textContent='☀️'),100);
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conviértete en Anfitrión — Spotlight</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: { extend: { colors: { spotlight: { black: '#050505', dark: '#111111', cyan: '#00E0FF', pink: '#FF007F' } } }, fontFamily: { sans: ['Outfit', 'sans-serif'] } }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/global-theme.css">
+    <style>
+        body { background-color: #050505; color: #F9F6F0; }
+        /* Tarjetas oscuras siempre oscuras en light mode */
+        body.light-mode .dark-card {
+            background-color: #FFFFFF !important;
+            border-color: #E5E7EB !important;
+            color: #111827 !important;
+        }
+        body.light-mode .dark-card h3,
+        body.light-mode .dark-card p { color: #111827 !important; }
+        body.light-mode .dark-card .text-gray-400 { color: #4B5563 !important; }
+        body.light-mode .dark-card .text-spotlight-cyan { color: #0891b2 !important; }
+        /* Stat flotante */
+        body.light-mode .stat-flotante {
+            background-color: #FFFFFF !important;
+            border-color: #E5E7EB !important;
+            color: #111827 !important;
+        }
+        body.light-mode .stat-flotante p { color: #4B5563 !important; }
+    </style>
+</head>
+<body class="font-sans antialiased min-h-screen relative overflow-x-hidden">
+
+    <!-- Background glow -->
+    <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[500px] bg-spotlight-cyan/10 blur-[150px] rounded-full pointer-events-none -z-10"></div>
+
+    <!-- Navbar -->
+    <nav class="border-b border-white/10 bg-spotlight-dark/50 sticky top-0 z-50 backdrop-blur-md">
+        <div class="max-w-7xl mx-auto px-4 flex items-center justify-between h-16">
+            <a href="../index.html" class="font-bold tracking-tight text-lg">SPOTLIGHT <span class="text-spotlight-cyan text-sm font-normal">Events</span></a>
+            <div class="flex items-center gap-4">
+                <button onclick="toggleTheme()" class="btn-theme-toggle text-xl p-2 rounded-full hover:bg-white/10 transition-colors">🌙</button>
+                <a href="login.html" class="text-spotlight-cyan font-bold hover:text-white transition-colors">Entrar</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero -->
+    <main class="max-w-7xl mx-auto px-4 py-20 lg:py-32 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+        <div>
+            <h1 class="text-5xl md:text-7xl font-bold mb-6 leading-tight">
+                Gana dinero con tu <span class="text-transparent bg-clip-text bg-gradient-to-r from-spotlight-cyan to-blue-500">espacio vacío</span>
+            </h1>
+            <p class="text-xl text-gray-400 mb-10 leading-relaxed">
+                Únete a la plataforma premium de Barranquilla. Si tienes una cancha deportiva, un salón de eventos o un auditorio, nosotros nos encargamos de conseguirte clientes, logística y pagos seguros.
+            </p>
+            <div class="flex flex-col sm:flex-row gap-4">
+                <!-- Botón dinámico según si el usuario está logueado o no -->
+                <button id="btnSerAnfitrion" onclick="abrirFlujoCambio()" class="bg-spotlight-cyan hover:bg-cyan-400 text-black font-bold text-lg py-4 px-8 rounded-xl shadow-[0_0_30px_rgba(0,224,255,0.3)] transition-transform transform hover:scale-105 text-center">
+                    Quiero ser Anfitrión
+                </button>
+                <a href="#beneficios" class="bg-white/5 border border-white/10 hover:bg-white/10 text-white font-bold text-lg py-4 px-8 rounded-xl transition-colors text-center">
+                    Ver Beneficios
+                </a>
+            </div>
+            <p id="textoAyuda" class="mt-4 text-sm text-gray-500">
+                *Crea tu cuenta usando un correo que contenga la palabra <b>host</b> (ej. micancha_host@gmail.com) para acceder a las herramientas premium.
+            </p>
+        </div>
+        
+        <div class="relative h-[400px] lg:h-[600px]">
+            <div class="absolute inset-0 bg-gradient-to-tr from-spotlight-dark to-transparent rounded-3xl border border-white/10 overflow-hidden">
+                <img src="https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&w=800&q=80" alt="Espacio de eventos" class="w-full h-full object-cover opacity-60">
+            </div>
+            <!-- Floating Stat -->
+                <div class="stat-flotante absolute bottom-10 left-4 md:-left-10 bg-spotlight-dark border border-white/10 p-6 rounded-2xl shadow-2xl backdrop-blur-md z-10">
+                <p class="text-sm text-gray-400 mb-1">Ingreso Promedio Mensual</p>
+                <p class="text-3xl font-bold text-spotlight-cyan">$3.5M COP</p>
+            </div>
+        </div>
+    </main>
+
+    <!-- Beneficios -->
+    <section id="beneficios" class="border-t border-white/5 py-20 bg-white/[0.02]">
+        <div class="max-w-7xl mx-auto px-4">
+            <h2 class="text-3xl font-bold mb-12 text-center">Por qué elegir <span class="text-spotlight-cyan">Spotlight</span></h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="dark-card bg-spotlight-dark border border-white/10 p-8 rounded-2xl hover:border-spotlight-cyan/50 transition-colors">
+                    <div class="text-4xl mb-4">🛡️</div>
+                    <h3 class="text-xl font-bold mb-2">Pagos Seguros</h3>
+                    <p class="text-gray-400">Recibe tu dinero directamente a través de Nequi, Wompi o transferencias bancarias, sin preocuparte por fraudes o efectivo.</p>
+                </div>
+                <div class="dark-card bg-spotlight-dark border border-white/10 p-8 rounded-2xl hover:border-spotlight-cyan/50 transition-colors">
+                    <div class="text-4xl mb-4">📈</div>
+                    <h3 class="text-xl font-bold mb-2">Alta Visibilidad</h3>
+                    <p class="text-gray-400">Nuestro catálogo premium es visitado por miles de empresas y personas que buscan eventos en Barranquilla diariamente.</p>
+                </div>
+                <div class="dark-card bg-spotlight-dark border border-white/10 p-8 rounded-2xl hover:border-spotlight-cyan/50 transition-colors">
+                    <div class="text-4xl mb-4">⚙️</div>
+                    <h3 class="text-xl font-bold mb-2">Control Total</h3>
+                    <p class="text-gray-400">Decide tus horarios, acepta o rechaza reservas, y gestiona todo desde tu Panel de Anfitrión con tu celular.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="border-t border-white/10 py-8 text-center text-gray-500 text-sm mt-8">
+        <div class="flex justify-center items-center gap-6 mb-4 flex-wrap">
+            <a href="https://www.instagram.com/sagan.xs/" target="_blank" class="flex items-center gap-2 text-gray-400 hover:text-pink-500 transition-colors">
+                <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+                @sagan.xs
+            </a>
+            <a href="https://play.google.com/store" target="_blank" class="flex items-center gap-2 border border-white/10 hover:border-spotlight-cyan px-4 py-2 rounded-xl text-white text-sm font-semibold transition-colors">
+                ▶ Descarga la App
+            </a>
+        </div>
+        <p>© 2026 Spotlight Events</p>
+    </footer>
+
+    <!-- Modal Términos y Condiciones -->
+    <div id="modalTyC" class="fixed inset-0 bg-black/80 backdrop-blur-md z-[100] flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300">
+        <div class="bg-spotlight-dark border border-white/10 w-full max-w-lg mx-4 rounded-2xl shadow-2xl overflow-hidden">
+            <div class="p-6 border-b border-white/10">
+                <h2 class="text-2xl font-bold">Conviértete en <span class="text-spotlight-cyan">Anfitrión</span></h2>
+                <p class="text-sm text-gray-400 mt-1">Acepta los términos para activar tu cuenta de anfitrión ahora mismo.</p>
+            </div>
+            <div class="p-6 max-h-64 overflow-y-auto text-sm text-gray-300 space-y-3">
+                <p>Al convertirte en Anfitrión de <strong>Spotlight Events</strong> aceptas los siguientes términos:</p>
+                <ul class="space-y-2 list-disc list-inside text-gray-400">
+                    <li>Publicar espacios con información verídica y fotos reales.</li>
+                    <li>Spotlight Events retiene el <strong>10% de comisión</strong> por cada reserva procesada.</li>
+                    <li>Recibirás el <strong>90% del valor</strong> de cada reserva vía Nequi o transferencia bancaria.</li>
+                    <li>Debes responder consultas de usuarios en menos de <strong>24 horas</strong>.</li>
+                    <li>Spotlight puede retirar tu espacio si recibe 3 o más reseñas negativas verificadas.</li>
+                    <li>Tus datos personales serán verificados antes de aparecer en el catálogo público.</li>
+                    <li>Aceptas recibir notificaciones de reservas y pagos vía WhatsApp y correo electrónico.</li>
+                </ul>
+                <p class="text-xs text-gray-500 mt-4">Versión 1.2 — Junio 2026 — Barranquilla, Colombia</p>
+            </div>
+            <div class="p-6 border-t border-white/10">
+                <label class="flex items-start gap-3 cursor-pointer mb-4">
+                    <input type="checkbox" id="checkTyC" class="mt-1 w-4 h-4 accent-cyan-400">
+                    <span class="text-sm text-gray-300">He leído y acepto los <strong class="text-spotlight-cyan">Términos y Condiciones</strong> de Spotlight Events como Anfitrión.</span>
+                </label>
+                <button onclick="confirmarCambioRol()" id="btnConfirmarRol" class="w-full bg-spotlight-cyan hover:bg-cyan-400 text-black font-bold py-3 rounded-xl transition-all disabled:opacity-40 disabled:cursor-not-allowed">
+                    ✅ Activar mi cuenta de Anfitrión
+                </button>
+                <button onclick="cerrarModal()" class="w-full mt-3 text-gray-500 hover:text-white text-sm font-semibold transition-colors">
+                    Cancelar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const user = JSON.parse(localStorage.getItem('spotlight_user'));
+
+        // Adaptar la UI según si el usuario está logueado
+        window.addEventListener('DOMContentLoaded', () => {
+            if (user) {
+                if (user.rol === 'host') {
+                    document.getElementById('btnSerAnfitrion').textContent = '🏠 Ir a mi Panel de Anfitrión';
+                    document.getElementById('btnSerAnfitrion').onclick = () => window.location.href = 'host.html';
+                    document.getElementById('textoAyuda').textContent = '✓ Tu cuenta ya tiene acceso de Anfitrión activo.';
+                } else {
+                    document.getElementById('btnSerAnfitrion').textContent = `🚀 Convertir mi cuenta en Anfitrión`;
+                    document.getElementById('textoAyuda').textContent = `✓ Estás logueado como ${user.nombre}. Un clic y activas el modo Anfitrión.`;
+                }
+            }
+        });
+
+        function abrirFlujoCambio() {
+            if (!user) {
+                window.location.href = 'login.html';
+                return;
+            }
+            if (user.rol === 'host') {
+                window.location.href = 'host.html';
+                return;
+            }
+            document.getElementById('modalTyC').classList.remove('opacity-0','pointer-events-none');
+        }
+
+        function cerrarModal() {
+            document.getElementById('modalTyC').classList.add('opacity-0','pointer-events-none');
+        }
+
+        function confirmarCambioRol() {
+            if (!document.getElementById('checkTyC').checked) {
+                alert('Debes aceptar los términos y condiciones para continuar.');
+                return;
+            }
+            // Actualizar rol en LocalStorage
+            user.rol = 'host';
+            localStorage.setItem('spotlight_user', JSON.stringify(user));
+            
+            cerrarModal();
+            // Animación de confirmación
+            document.getElementById('btnSerAnfitrion').textContent = '✅ ¡Activado!';
+            document.getElementById('btnSerAnfitrion').classList.replace('bg-spotlight-cyan','bg-green-500');
+            
+            setTimeout(() => window.location.href = 'host.html', 1200);
+        }
+    </script>
+    <script>
+        window.toggleTheme = () => {
+            document.body.classList.toggle('light-mode');
+            const isLight = document.body.classList.contains('light-mode');
+            localStorage.setItem('spotlight_theme', isLight ? 'light' : 'dark');
+            document.querySelectorAll('.btn-theme-toggle').forEach(b => b.textContent = isLight ? '☀️' : '🌙');
+        };
+        if(localStorage.getItem('spotlight_theme')==='light'){
+            document.body.classList.add('light-mode');
+            setTimeout(()=>document.querySelectorAll('.btn-theme-toggle').forEach(b=>b.textContent='☀️'),100);
+        }
+    </script>
+</body>
+</html>

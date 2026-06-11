@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel Administrador — Spotlight Events</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: { colors: { spotlight: { black: '#050505', dark: '#111111', cyan: '#00E0FF', gold: '#FFB800' } } },
+                fontFamily: { sans: ['Outfit', 'sans-serif'] }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background-color: #050505;
+            color: #F9F6F0;
+        }
+    </style>
+</head>
+
+<body class="font-sans antialiased min-h-screen">
+
+    <nav class="border-b border-white/10 bg-spotlight-dark/50 sticky top-0 z-50 backdrop-blur-md">
+        <div class="max-w-7xl mx-auto px-4 flex items-center justify-between h-16">
+            <div class="flex items-center gap-4">
+                <div
+                    class="w-8 h-8 rounded bg-black border border-white/10 flex items-center justify-center text-spotlight-gold font-bold">
+                    👑</div>
+                <span class="font-bold tracking-tight">Admin <span class="text-spotlight-cyan">Dashboard</span></span>
+            </div>
+            <div class="flex gap-4">
+                <a href="../index.html"
+                    class="text-gray-400 hover:text-white text-sm font-semibold transition-colors">Ver Sitio</a>
+                <button id="btnLogout"
+                    class="text-red-400 hover:text-red-300 text-sm font-semibold transition-colors">Cerrar
+                    Sesión</button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-7xl mx-auto px-4 py-8">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <div class="bg-spotlight-dark border border-white/10 rounded-xl p-6">
+                <p class="text-sm text-gray-400">Total Transacciones</p>
+                <p class="text-3xl font-bold text-spotlight-cyan mt-2" id="kpi-tx">0</p>
+            </div>
+            <div class="bg-spotlight-dark border border-white/10 rounded-xl p-6">
+                <p class="text-sm text-gray-400">Comisiones Spotlight (10%)</p>
+                <p class="text-3xl font-bold text-spotlight-gold mt-2" id="kpi-comision">$0</p>
+            </div>
+            <div class="bg-spotlight-dark border border-white/10 rounded-xl p-6">
+                <p class="text-sm text-gray-400">Espacios Verificados</p>
+                <p class="text-3xl font-bold mt-2" id="kpi-espacios">0</p>
+            </div>
+        </div>
+
+        <div class="bg-spotlight-dark border border-white/10 rounded-xl overflow-hidden">
+            <div class="border-b border-white/10 px-6 py-4 flex justify-between items-center bg-white/5">
+                <h3 class="font-semibold">Auditoría de Pagos Recientes</h3>
+                <span class="text-xs text-spotlight-cyan bg-spotlight-cyan/10 px-2 py-1 rounded">Wompi Nequi API</span>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-sm">
+                    <thead class="bg-black/50 text-gray-400">
+                        <tr>
+                            <th class="px-6 py-4 font-medium">Ref</th>
+                            <th class="px-6 py-4 font-medium">Espacio</th>
+                            <th class="px-6 py-4 font-medium">Monto Bruto</th>
+                            <th class="px-6 py-4 font-medium">Comisión 10%</th>
+                        </tr>
+                    </thead>
+                    <tbody id="admin-tx-table" class="divide-y divide-white/5">
+                        <!-- Llenado por JS -->
+                        <tr>
+                            <td colspan="4" class="px-6 py-8 text-center text-gray-500">Cargando transacciones...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <script src="../data.js"></script>
+    <script type="module">
+        import { requerirRol } from '../js/guards/authGuard.js';
+        import { cerrarSesion } from '../js/services/auth.js';
+        import { obtenerTransacciones, obtenerTodosLosEspacios } from '../js/services/db.js';
+
+        // 1. Proteger ruta: Solo 'admin' puede ver esto
+        const adminUser = requerirRol('admin');
+
+        if (adminUser) {
+            document.getElementById('btnLogout').addEventListener('click', cerrarSesion);
+
+            // 2. Cargar datos
+            const txs = await obtenerTransacciones();
+            const espacios = await obtenerTodosLosEspacios();
+
+            document.getElementById('kpi-tx').textContent = txs.length;
+            document.getElementById('kpi-espacios').textContent = espacios ? espacios.length : 0;
+
+            let comisionesTotales = 0;
+            const tbody = document.getElementById('admin-tx-table');
+
+            if (txs.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" class="px-6 py-8 text-center text-gray-500">No hay transacciones registradas.</td></tr>';
+            } else {
+                tbody.innerHTML = txs.map(tx => {
+                    const comision = Math.round(tx.total * 0.1);
+                    comisionesTotales += comision;
+                    return `<tr class="hover:bg-white/5 transition-colors">
+                        <td class="px-6 py-4 font-mono text-xs text-gray-400">${tx.id}</td>
+                        <td class="px-6 py-4 font-semibold">${tx.cancha}</td>
+                        <td class="px-6 py-4">$${tx.total.toLocaleString('es-CO')} COP</td>
+                        <td class="px-6 py-4 text-spotlight-gold font-semibold">+$${comision.toLocaleString('es-CO')}</td>
+                    </tr>`;
+                }).join('');
+            }
+
+            document.getElementById('kpi-comision').textContent = `$${comisionesTotales.toLocaleString('es-CO')}`;
+        }
+    </script>
+</body>
+
+</html>

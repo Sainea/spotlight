@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Perfil del Anfitrión — Spotlight</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: { extend: { colors: { spotlight: { black: '#050505', dark: '#111111', cyan: '#00E0FF', pink: '#FF007F' } } }, fontFamily: { sans: ['Outfit', 'sans-serif'] } }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/global-theme.css">
+    <!-- Confetti para animación de logros -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/canvas-confetti/1.9.2/confetti.browser.min.js"></script>
+    <style>
+        body { background-color: #050505; color: #F9F6F0; }
+        .glass-card { background: rgba(17, 17, 17, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.1); }
+        body.light-mode .glass-card { background: rgba(255,255,255,0.95) !important; border-color: #E5E7EB !important; color: #111827 !important; }
+        body.light-mode .glass-card p, body.light-mode .glass-card span { color: #374151 !important; }
+    </style>
+</head>
+<body class="font-sans antialiased min-h-screen pb-20">
+
+    <!-- Navbar -->
+    <nav class="border-b border-white/10 bg-spotlight-dark/50 sticky top-0 z-50 backdrop-blur-md">
+        <div class="max-w-7xl mx-auto px-4 flex items-center justify-between h-16">
+            <a href="javascript:history.back()" class="flex items-center gap-2 text-gray-400 hover:text-white transition-colors">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                Volver
+            </a>
+            <div class="font-bold tracking-tight text-lg">SPOTLIGHT <span class="text-spotlight-cyan">Perfil</span></div>
+            <button onclick="toggleTheme()" class="btn-theme-toggle text-xl p-2 rounded-full hover:bg-white/10 transition-colors">🌙</button>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="max-w-5xl mx-auto px-4 py-12">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-12">
+            
+            <!-- Left Column (Tarjeta Anfitrión) -->
+            <div class="md:col-span-1">
+                <div class="glass-card rounded-3xl p-8 shadow-2xl flex flex-col items-center text-center sticky top-24">
+                    <div class="relative w-32 h-32 mb-4 cursor-pointer group" onclick="abrirModalVerificacion()">
+                        <img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80" alt="Avatar" class="w-full h-full rounded-full object-cover border-4 border-spotlight-cyan shadow-[0_0_20px_rgba(0,224,255,0.3)] group-hover:scale-105 transition-transform duration-300">
+                        <div class="absolute bottom-0 right-0 bg-spotlight-cyan text-black w-8 h-8 rounded-full flex items-center justify-center font-bold text-lg border-2 border-black group-hover:scale-110 transition-transform" title="Identidad Verificada">✓</div>
+                    </div>
+                    <h1 class="text-3xl font-bold mb-1" id="host-name">Carlos</h1>
+                    <p class="text-spotlight-cyan font-semibold text-sm mb-6">Anfitrión Verificado</p>
+
+                    <div class="grid grid-cols-2 gap-4 w-full border-t border-white/10 pt-6">
+                        <div class="text-center">
+                            <p class="text-2xl font-bold">157</p>
+                            <p class="text-[10px] uppercase text-gray-500 font-bold">Reseñas</p>
+                        </div>
+                        <div class="text-center border-l border-white/10">
+                            <p class="text-2xl font-bold flex items-center justify-center gap-1">4.9<span class="text-sm">⭐</span></p>
+                            <p class="text-[10px] uppercase text-gray-500 font-bold">Calificación</p>
+                        </div>
+                        <div class="col-span-2 text-center border-t border-white/10 pt-4 mt-2">
+                            <p class="text-2xl font-bold">5</p>
+                            <p class="text-[10px] uppercase text-gray-500 font-bold">Años hospedando</p>
+                        </div>
+                    </div>
+                    <!-- Botón denunciar -->
+                    <button onclick="abrirModalDenuncia()" class="mt-4 w-full flex items-center justify-center gap-2 text-red-400 hover:text-red-300 text-xs font-semibold py-2 rounded-xl border border-red-500/20 hover:border-red-500/40 hover:bg-red-500/5 transition-all">
+                        ⚠️ Denunciar a este anfitrión
+                    </button>
+                </div>
+            </div>
+
+            <!-- Right Column (Detalles y Biografía) -->
+            <div class="md:col-span-2 space-y-12">
+                
+                <!-- Biografía -->
+                <section>
+                    <h2 class="text-3xl font-bold mb-8">Acerca de Carlos</h2>
+                    <ul class="space-y-4 text-gray-300">
+                        <li class="flex items-start gap-4">
+                            <span class="text-2xl">💼</span>
+                            <div>
+                                <span class="font-bold text-white block">A qué me dedico</span>
+                                Empresario del sector deportivo y eventos corporativos.
+                            </div>
+                        </li>
+                        <li class="flex items-start gap-4">
+                            <span class="text-2xl">🌟</span>
+                            <div>
+                                <span class="font-bold text-white block">Por qué mis espacios son únicos</span>
+                                Están equipados con tecnología de última generación y ubicados estratégicamente.
+                            </div>
+                        </li>
+                        <li class="flex items-start gap-4">
+                            <span class="text-2xl">🗣️</span>
+                            <div>
+                                <span class="font-bold text-white block">Idiomas</span>
+                                Habla Español e Inglés.
+                            </div>
+                        </li>
+                        <li class="flex items-start gap-4">
+                            <span class="text-2xl">📍</span>
+                            <div>
+                                <span class="font-bold text-white block">Vive en</span>
+                                Barranquilla, Atlántico, Colombia.
+                            </div>
+                        </li>
+                    </ul>
+                    <p class="mt-8 text-gray-400 leading-relaxed">
+                        "Me apasiona brindar espacios impecables para que las personas disfruten y creen recuerdos inolvidables, ya sea en un partido de fútbol con amigos o en un evento corporativo de alto nivel. Trataré de hacer de tu experiencia algo fenomenal."
+                    </p>
+                </section>
+
+                <hr class="border-white/10">
+
+                <!-- Reviews -->
+                <section>
+                    <h2 class="text-2xl font-bold mb-6">Reseñas de Carlos</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="bg-spotlight-dark border border-white/10 p-5 rounded-2xl">
+                            <div class="flex items-center gap-3 mb-3">
+                                <div class="w-10 h-10 bg-blue-900 rounded-full flex items-center justify-center font-bold">A</div>
+                                <div>
+                                    <p class="font-bold text-sm">Andrea</p>
+                                    <p class="text-xs text-gray-500">Hace 1 semana</p>
+                                </div>
+                            </div>
+                            <p class="text-spotlight-cyan text-xs mb-2">⭐⭐⭐⭐⭐</p>
+                            <p class="text-sm text-gray-300">Buen lugar y el anfitrión es súper flexible y amable. Recomendadísimo.</p>
+                        </div>
+                        
+                        <div class="bg-spotlight-dark border border-white/10 p-5 rounded-2xl">
+                            <div class="flex items-center gap-3 mb-3">
+                                <div class="w-10 h-10 bg-green-900 rounded-full flex items-center justify-center font-bold">S</div>
+                                <div>
+                                    <p class="font-bold text-sm">Santiago</p>
+                                    <p class="text-xs text-gray-500">Hace 3 semanas</p>
+                                </div>
+                            </div>
+                            <p class="text-spotlight-cyan text-xs mb-2">⭐⭐⭐⭐⭐</p>
+                            <p class="text-sm text-gray-300">Pasé un rato excelente. El lugar estaba súper limpio y Carlos siempre estuvo atento al chat.</p>
+                        </div>
+                    </div>
+                </section>
+
+                <hr class="border-white/10">
+
+                <!-- Insignias y Logros Gamificados -->
+                <section>
+                    <div id="gamification-section">Cargando logros...</div>
+                </section>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal Verificación -->
+    <div id="modalVerificacion" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[100] flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300">
+        <div class="bg-spotlight-dark border border-white/10 w-full max-w-md rounded-2xl p-6 relative shadow-2xl transform scale-95 transition-transform duration-300" id="modalVerificacionContent">
+            <button onclick="cerrarModalVerificacion()" class="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors z-10">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+            
+            <div class="bg-gradient-to-br from-spotlight-pink to-spotlight-cyan p-6 rounded-xl mb-6 shadow-lg text-left relative overflow-hidden">
+                <div class="absolute inset-0 bg-black/20 mix-blend-overlay"></div>
+                <h3 class="relative text-2xl font-bold text-white mb-1">Carlos</h3>
+                <p class="relative text-white font-semibold mb-4">Verificado desde junio de 2021</p>
+                <p class="relative text-white/90 text-sm font-medium">La confianza es el pilar de la comunidad de Spotlight y la verificación de identidad es una forma de fortalecerla.</p>
+            </div>
+            
+            <p class="text-sm text-gray-300 mb-4 leading-relaxed">
+                Nuestro proceso de verificación de identidad compara la información de una persona con fuentes de terceros de confianza o con un documento de identidad oficial. El proceso tiene salvaguardas, pero no asegura que alguien sea quien dice ser.
+            </p>
+            <a href="#" onclick="cerrarModalVerificacion()" class="text-spotlight-cyan font-bold hover:underline">Más información</a>
+        </div>
+    </div>
+
+    <script type="module">
+        import { inicializarTema } from '../js/components/theme.js';
+        import { simularReservasDemo, verificarInsignias, renderInsignias, lanzarConfeti } from '../js/services/gamification.js';
+        
+        inicializarTema();
+        
+        // Simular datos demo para la presentación
+        simularReservasDemo();
+        const nuevas = verificarInsignias();
+        renderInsignias('gamification-section');
+        
+        // Si hay insignias nuevas en esta sesión demo, celebrar
+        if(nuevas.length > 0 && !sessionStorage.getItem('badges_mostrados')) {
+            setTimeout(() => { lanzarConfeti(); }, 800);
+            sessionStorage.setItem('badges_mostrados', 'si');
+        }
+    </script>
+
+    <!-- Modal Denuncia -->
+    <div id="modalDenuncia" class="fixed inset-0 bg-black/80 backdrop-blur-md z-[200] flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300">
+        <div class="bg-spotlight-dark border border-white/10 w-full max-w-md mx-4 rounded-2xl shadow-2xl overflow-hidden">
+            <div class="p-6 border-b border-white/10 flex items-center justify-between">
+                <h2 class="text-xl font-bold text-red-400">⚠️ Denunciar Anfitrión</h2>
+                <button onclick="cerrarModalDenuncia()" class="text-gray-400 hover:text-white text-xl">✕</button>
+            </div>
+            <div class="p-6 space-y-4">
+                <p class="text-sm text-gray-400">Selecciona el motivo de la denuncia:</p>
+                <div class="space-y-2" id="motivosDenuncia">
+                    <label class="flex items-center gap-3 p-3 rounded-xl border border-white/10 hover:border-red-500/40 cursor-pointer transition-colors">
+                        <input type="radio" name="motivoDen" value="fraude" class="accent-red-500"> <span class="text-sm">Información falsa o fraude</span>
+                    </label>
+                    <label class="flex items-center gap-3 p-3 rounded-xl border border-white/10 hover:border-red-500/40 cursor-pointer transition-colors">
+                        <input type="radio" name="motivoDen" value="acoso" class="accent-red-500"> <span class="text-sm">Acoso o conducta inapropiada</span>
+                    </label>
+                    <label class="flex items-center gap-3 p-3 rounded-xl border border-white/10 hover:border-red-500/40 cursor-pointer transition-colors">
+                        <input type="radio" name="motivoDen" value="espacio" class="accent-red-500"> <span class="text-sm">El espacio no era como se describe</span>
+                    </label>
+                    <label class="flex items-center gap-3 p-3 rounded-xl border border-white/10 hover:border-red-500/40 cursor-pointer transition-colors">
+                        <input type="radio" name="motivoDen" value="otro" class="accent-red-500"> <span class="text-sm">Otro motivo</span>
+                    </label>
+                </div>
+                <div>
+                    <label class="block text-xs uppercase text-gray-500 mb-1">Descripción adicional (opcional)</label>
+                    <textarea id="descDenuncia" rows="3" placeholder="Cuéntanos qué pasó..." class="w-full bg-black border border-white/10 rounded-xl px-4 py-3 text-white text-sm outline-none focus:border-red-400 transition-colors resize-none"></textarea>
+                </div>
+                <button onclick="enviarDenuncia()" class="w-full bg-red-500 hover:bg-red-400 text-white font-bold py-3 rounded-xl transition-colors">
+                    Enviar Denuncia
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function abrirModalDenuncia() {
+            document.getElementById('modalDenuncia').classList.remove('opacity-0','pointer-events-none');
+        }
+        function cerrarModalDenuncia() {
+            document.getElementById('modalDenuncia').classList.add('opacity-0','pointer-events-none');
+        }
+        function enviarDenuncia() {
+            const motivo = document.querySelector('input[name="motivoDen"]:checked');
+            if (!motivo) { alert('Selecciona un motivo para continuar.'); return; }
+            const desc = document.getElementById('descDenuncia').value;
+            // Guardar en localStorage (en producción iría a Firestore)
+            const denuncias = JSON.parse(localStorage.getItem('spotlight_denuncias') || '[]');
+            denuncias.push({ hostId: 'host-carlos', motivo: motivo.value, desc, fecha: new Date().toISOString() });
+            localStorage.setItem('spotlight_denuncias', JSON.stringify(denuncias));
+            cerrarModalDenuncia();
+            alert('✅ Tu denuncia fue recibida. Nuestro equipo la revisará en menos de 48 horas. Gracias por ayudarnos a mantener la comunidad segura.');
+        }
+        window.toggleTheme = () => {
+            document.body.classList.toggle('light-mode');
+            const isLight = document.body.classList.contains('light-mode');
+            localStorage.setItem('spotlight_theme', isLight ? 'light' : 'dark');
+            document.querySelectorAll('.btn-theme-toggle').forEach(b => b.textContent = isLight ? '☀️' : '🌙');
+        };
+        if(localStorage.getItem('spotlight_theme')==='light'){
+            document.body.classList.add('light-mode');
+            setTimeout(()=>document.querySelectorAll('.btn-theme-toggle').forEach(b=>b.textContent='☀️'),100);
+        }
+    </script>
+</body>
+</html>

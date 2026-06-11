@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acceder — Spotlight Events</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        spotlight: { black: '#050505', dark: '#111111', cyan: '#00E0FF' }
+                    },
+                    fontFamily: { sans: ['Outfit', 'sans-serif'] }
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/global-theme.css">
+    <style>
+        body { background-color: #050505; color: #F9F6F0; }
+        /* Login card en modo claro */
+        body.light-mode { background-color: #F3F4F6 !important; }
+        body.light-mode .login-card {
+            background: #ffffff !important;
+            border-color: #E5E7EB !important;
+            color: #111827 !important;
+        }
+        body.light-mode .login-card h2,
+        body.light-mode .login-card label,
+        body.light-mode .login-card p { color: #111827 !important; }
+        body.light-mode .login-card .text-gray-300 { color: #374151 !important; }
+        body.light-mode .login-card .text-gray-400 { color: #4B5563 !important; }
+        body.light-mode .login-card input {
+            background-color: #F9FAFB !important;
+            border-color: #D1D5DB !important;
+            color: #111827 !important;
+        }
+        body.light-mode .login-card .bg-black\/50 {
+            background-color: #F3F4F6 !important;
+        }
+        body.light-mode .back-link { color: #374151 !important; }
+        body.light-mode .back-link:hover { color: #111827 !important; }
+    </style>
+</head>
+<body class="font-sans antialiased min-h-screen flex items-center justify-center relative overflow-hidden">
+
+    <!-- Botón volver + tema -->
+    <div class="absolute top-6 left-6 right-6 flex justify-between items-center">
+        <a href="../index.html" class="back-link text-gray-400 hover:text-white flex items-center gap-2 transition-colors text-sm">
+            ← Volver al inicio
+        </a>
+        <button onclick="toggleTheme()" class="btn-theme-toggle text-xl p-2 rounded-full bg-white/5 hover:bg-white/10 transition-colors">🌙</button>
+    </div>
+
+    <!-- Glow -->
+    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-spotlight-cyan/10 blur-[100px] rounded-full pointer-events-none"></div>
+
+    <div class="login-card w-full max-w-md bg-spotlight-dark/80 backdrop-blur-xl border border-white/10 rounded-2xl p-8 relative z-10 shadow-2xl">
+        <div class="text-center mb-8">
+            <div class="w-12 h-12 mx-auto bg-black border border-white/10 rounded-xl flex items-center justify-center text-spotlight-cyan font-bold text-2xl shadow-[0_0_15px_rgba(0,224,255,0.3)] mb-4">S</div>
+            <h2 class="text-2xl font-bold">Iniciar Sesión</h2>
+            <p class="text-gray-400 text-sm mt-2">Accede a tu cuenta de Spotlight</p>
+        </div>
+
+        <form id="loginForm" class="space-y-5">
+            <input type="hidden" id="formType" value="login">
+            <div id="nameField" style="display: none;">
+                <label class="block text-sm font-medium text-gray-300 mb-1">Nombre Completo</label>
+                <input type="text" id="nombre" class="w-full bg-black border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-spotlight-cyan focus:ring-1 focus:ring-spotlight-cyan transition-colors" placeholder="Tu Nombre">
+            </div>
+            
+            <div id="termsField" style="display: none;" class="flex items-start gap-2 mt-2">
+                <input type="checkbox" id="terms" class="mt-1 w-4 h-4 rounded bg-black border-white/10 text-spotlight-cyan focus:ring-spotlight-cyan">
+                <label for="terms" class="text-xs text-gray-400">Acepto los <a href="#" class="text-spotlight-cyan hover:underline">Términos y Condiciones</a> y la Política de Privacidad de Spotlight Events.</label>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-300 mb-1">Correo Electrónico</label>
+                <input type="email" id="email" required class="w-full bg-black border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-spotlight-cyan focus:ring-1 focus:ring-spotlight-cyan transition-colors" placeholder="ejemplo@correo.com">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-300 mb-1">Contraseña</label>
+                <input type="password" id="password" required class="w-full bg-black border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-spotlight-cyan focus:ring-1 focus:ring-spotlight-cyan transition-colors" placeholder="••••••••">
+            </div>
+            
+            <button type="submit" id="btnSubmit" class="w-full bg-spotlight-cyan hover:bg-cyan-400 text-black font-bold py-3 px-4 rounded-lg shadow-[0_0_20px_rgba(0,224,255,0.3)] transition-all transform hover:scale-[1.02]">
+                Entrar a mi Cuenta
+            </button>
+            <div class="flex items-center justify-between mt-4">
+                <button type="button" id="btnToggle" class="text-sm text-spotlight-cyan hover:text-white transition-colors">¿No tienes cuenta? Regístrate aquí</button>
+                <button type="button" onclick="olvideMiPass()" class="text-sm text-gray-500 hover:text-spotlight-cyan transition-colors">¿Olvidé mi contraseña?</button>
+            </div>
+        </form>
+
+        <div class="mt-6 text-center text-sm text-gray-400 border-t border-white/10 pt-6">
+            <p class="mb-3 font-semibold text-gray-300">&#9889; Acceso rápido demo (presentación):</p>
+            <div class="grid grid-cols-3 gap-2">
+                <button onclick="loginDemo('host')" class="bg-spotlight-cyan/10 border border-spotlight-cyan/30 hover:bg-spotlight-cyan/20 text-spotlight-cyan font-bold py-2.5 px-3 rounded-xl text-xs transition-all hover:scale-105">
+                    🏠 Anfitrión
+                </button>
+                <button onclick="loginDemo('cliente')" class="bg-white/5 border border-white/10 hover:bg-white/10 text-white font-bold py-2.5 px-3 rounded-xl text-xs transition-all hover:scale-105">
+                    👤 Cliente
+                </button>
+                <button onclick="loginDemo('admin')" class="bg-pink-500/10 border border-pink-500/30 hover:bg-pink-500/20 text-pink-400 font-bold py-2.5 px-3 rounded-xl text-xs transition-all hover:scale-105">
+                    🛡️ Admin
+                </button>
+            </div>
+            <p class="mt-3 text-[10px] text-gray-600">Solo para demostración — sin Firebase</p>
+        </div>
+    </div>
+
+    <!-- Modal Recuperar Contraseña -->
+    <div id="modalResetPass" class="fixed inset-0 bg-black/70 backdrop-blur-md z-[200] flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300">
+        <div class="login-card w-full max-w-sm mx-4 rounded-2xl shadow-2xl p-8 border border-white/10 bg-spotlight-dark">
+            <div class="text-center mb-6">
+                <div class="w-14 h-14 mx-auto bg-spotlight-cyan/10 border border-spotlight-cyan/30 rounded-2xl flex items-center justify-center text-3xl mb-4">🔐</div>
+                <h3 class="text-xl font-bold">Recuperar Contraseña</h3>
+                <p class="text-sm text-gray-400 mt-1">Ingresa tu correo y te enviaremos un enlace para restablecerla.</p>
+            </div>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs uppercase text-gray-500 mb-1">Correo electrónico</label>
+                    <input id="resetEmail" type="email" placeholder="ejemplo@correo.com" class="w-full bg-black border border-white/10 rounded-xl px-4 py-3 text-white outline-none focus:border-spotlight-cyan transition-colors">
+                </div>
+                <p id="resetMsg" class="text-sm hidden"></p>
+                <button onclick="enviarResetPass()" id="btnReset" class="w-full bg-spotlight-cyan hover:bg-cyan-400 text-black font-bold py-3 rounded-xl transition-all">
+                    Enviar enlace de recuperación
+                </button>
+                <button onclick="cerrarModalReset()" class="w-full text-gray-500 hover:text-white text-sm font-semibold transition-colors py-2">
+                    Cancelar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script connection (Modular) -->
+    <script type="module">
+        import { iniciarSesion, registrarUsuario, recuperarContrasena } from '../js/services/auth.js';
+
+        window.olvideMiPass = () => {
+            // Prellenar email si ya lo escribió
+            const emailVal = document.getElementById('email').value;
+            if (emailVal) document.getElementById('resetEmail').value = emailVal;
+            document.getElementById('resetMsg').classList.add('hidden');
+            document.getElementById('modalResetPass').classList.remove('opacity-0', 'pointer-events-none');
+        };
+
+        window.cerrarModalReset = () => {
+            document.getElementById('modalResetPass').classList.add('opacity-0', 'pointer-events-none');
+        };
+
+        window.enviarResetPass = async () => {
+            const email = document.getElementById('resetEmail').value.trim();
+            const msg = document.getElementById('resetMsg');
+            const btn = document.getElementById('btnReset');
+            if (!email) { msg.className = 'text-sm text-red-400'; msg.textContent = 'Ingresa tu correo electrónico.'; msg.classList.remove('hidden'); return; }
+            btn.textContent = 'Enviando...'; btn.disabled = true;
+            const result = await recuperarContrasena(email);
+            btn.textContent = 'Enviar enlace de recuperación'; btn.disabled = false;
+            if (result.success) {
+                msg.className = 'text-sm text-green-400';
+                msg.textContent = '✅ Correo enviado. Revisa tu bandeja de entrada y SPAM.';
+                msg.classList.remove('hidden');
+                setTimeout(cerrarModalReset, 3000);
+            } else {
+                msg.className = 'text-sm text-red-400';
+                msg.textContent = '❌ ' + result.error;
+                msg.classList.remove('hidden');
+            }
+        };
+
+        const formType = document.getElementById('formType');
+        const nameField = document.getElementById('nameField');
+        const termsField = document.getElementById('termsField');
+        const btnSubmit = document.getElementById('btnSubmit');
+        const btnToggle = document.getElementById('btnToggle');
+        const title = document.querySelector('h2');
+        const subtitle = document.querySelector('p');
+
+        btnToggle.addEventListener('click', () => {
+            if (formType.value === 'login') {
+                formType.value = 'register';
+                nameField.style.display = 'block';
+                termsField.style.display = 'flex';
+                document.getElementById('nombre').required = true;
+                document.getElementById('terms').required = true;
+                btnSubmit.textContent = 'Crear Cuenta';
+                btnToggle.textContent = '¿Ya tienes cuenta? Inicia sesión';
+                title.textContent = 'Crear Cuenta';
+                subtitle.textContent = 'Únete a Spotlight Events';
+            } else {
+                formType.value = 'login';
+                nameField.style.display = 'none';
+                termsField.style.display = 'none';
+                document.getElementById('nombre').required = false;
+                document.getElementById('terms').required = false;
+                btnSubmit.textContent = 'Entrar a mi Cuenta';
+                btnToggle.textContent = '¿No tienes cuenta? Regístrate aquí';
+                title.textContent = 'Iniciar Sesión';
+                subtitle.textContent = 'Accede a tu cuenta de Spotlight';
+            }
+        });
+
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const pass = document.getElementById('password').value;
+            const nombre = document.getElementById('nombre').value;
+            
+            btnSubmit.textContent = 'Cargando...';
+            btnSubmit.disabled = true;
+
+            let result;
+            if (formType.value === 'login') {
+                result = await iniciarSesion(email, pass);
+            } else {
+                result = await registrarUsuario(nombre, email, pass);
+            }
+            
+            if (result.success) {
+                if (formType.value === 'register') {
+                    // Si se acaba de registrar, le mostramos la alerta de verificar correo y lo regresamos al login
+                    alert(result.message);
+                    document.getElementById('loginForm').reset();
+                    btnToggle.click();
+                    btnSubmit.textContent = 'Entrar a mi Cuenta';
+                    btnSubmit.disabled = false;
+                } else {
+                    // Si inició sesión (y ya estaba verificado)
+                    if (result.user.rol === 'admin') window.location.href = 'admin.html';
+                    else if (result.user.rol === 'host') window.location.href = 'onboarding.html';
+                    else window.location.href = 'catalog.html';
+                }
+            } else {
+                alert(result.error);
+                btnSubmit.textContent = formType.value === 'login' ? 'Entrar a mi Cuenta' : 'Crear Cuenta';
+                btnSubmit.disabled = false;
+            }
+        });
+    </script>
+    <script>
+        // Demo instantáneo — sin Firebase
+        function loginDemo(rol) {
+            const demos = {
+                host:    { uid: 'demo-host-001',    email: 'host@salones.co',           nombre: 'Carlos Demo',  rol: 'host'    },
+                cliente: { uid: 'demo-cliente-001', email: 'botfutbol8@gmail.com',      nombre: 'Brayan Demo',  rol: 'cliente' },
+                admin:   { uid: 'demo-admin-001',   email: 'admin@spotlightevents.co',  nombre: 'Admin Demo',   rol: 'admin'   },
+            };
+            const user = demos[rol];
+            localStorage.setItem('spotlight_user', JSON.stringify(user));
+
+            // Animar botón
+            event.target.textContent = '✓ Entrando...';
+            
+            setTimeout(() => {
+                if (rol === 'admin')   window.location.href = 'admin.html';
+                else if (rol === 'host') window.location.href = 'host.html';
+                else                    window.location.href = 'catalog.html';
+            }, 600);
+        }
+    </script>
+    <script>
+        window.toggleTheme = () => {
+            document.body.classList.toggle('light-mode');
+            const isLight = document.body.classList.contains('light-mode');
+            localStorage.setItem('spotlight_theme', isLight ? 'light' : 'dark');
+            document.querySelectorAll('.btn-theme-toggle').forEach(b => b.textContent = isLight ? '☀️' : '🌙');
+        };
+        if(localStorage.getItem('spotlight_theme')==='light'){
+            document.body.classList.add('light-mode');
+            setTimeout(()=>document.querySelectorAll('.btn-theme-toggle').forEach(b=>b.textContent='☀️'),100);
+        }
+    </script>
+</body>
+</html>

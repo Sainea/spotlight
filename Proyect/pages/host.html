@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel Anfitrión — Spotlight Events</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>tailwind.config={theme:{extend:{colors:{spotlight:{black:'#050505',dark:'#111111',cyan:'#00E0FF',pink:'#FF007F'}}}},fontFamily:{sans:['Outfit','sans-serif']}}</script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/global-theme.css">
+    <!-- Chart.js para las gráficas -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+    <style>
+        body { background-color: #050505; color: #F9F6F0; }
+        .stat-card {
+            background: rgba(17,17,17,0.9);
+            border: 1px solid rgba(255,255,255,0.08);
+            backdrop-filter: blur(10px);
+        }
+        body.light-mode .stat-card {
+            background: #FFFFFF !important;
+            border-color: #E5E7EB !important;
+            color: #111827 !important;
+        }
+        body.light-mode .stat-card h3,
+        body.light-mode .stat-card p { color: #111827 !important; }
+        body.light-mode .stat-card .text-gray-500 { color: #6B7280 !important; }
+        body.light-mode aside {
+            background-color: #FFFFFF !important;
+            border-color: #E5E7EB !important;
+        }
+        body.light-mode .sidebar-link.active { background: rgba(0,224,255,0.08) !important; }
+        body.light-mode .sidebar-link { color: #374151 !important; }
+        body.light-mode nav { background: rgba(255,255,255,0.95) !important; border-color: #E5E7EB !important; }
+        /* Reservas items en light mode */
+        body.light-mode .bg-white\/5 { background-color: #F9FAFB !important; color: #111827 !important; }
+        body.light-mode .bg-white\/5 p, body.light-mode .bg-white\/5 span { color: #111827 !important; }
+        body.light-mode .text-white { color: #111827 !important; }
+        body.light-mode .text-gray-400 { color: #4B5563 !important; }
+        body.light-mode .text-gray-500 { color: #6B7280 !important; }
+        body.light-mode .border-white\/10 { border-color: #E5E7EB !important; }
+        body.light-mode .bg-spotlight-dark\/30 { background-color: #F3F4F6 !important; }
+        body.light-mode .bg-spotlight-dark { background-color: #FFFFFF !important; }
+        body.light-mode input, body.light-mode select, body.light-mode textarea {
+            background-color: #F9FAFB !important;
+            color: #111827 !important;
+            border-color: #D1D5DB !important;
+        }
+        .chart-container { position: relative; height: 220px; }
+        .sidebar-link.active { background: rgba(0,224,255,0.1); color: #00E0FF; border-left: 3px solid #00E0FF; }
+        .sidebar-link { border-left: 3px solid transparent; }
+    </style>
+</head>
+<body class="font-sans antialiased min-h-screen">
+
+    <!-- Navbar -->
+    <nav class="border-b border-white/10 bg-spotlight-dark/80 sticky top-0 z-50 backdrop-blur-md">
+        <div class="max-w-7xl mx-auto px-4 flex items-center justify-between h-16">
+            <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-lg bg-spotlight-cyan/10 border border-spotlight-cyan/30 flex items-center justify-center text-spotlight-cyan font-bold text-sm">🏠</div>
+                <div>
+                    <span class="font-bold tracking-tight">Panel <span class="text-spotlight-cyan">Anfitrión</span></span>
+                    <p id="hostNameNav" class="text-[10px] text-gray-500 -mt-0.5">Cargando...</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-4">
+                <button onclick="toggleTheme()" class="btn-theme-toggle text-xl p-2 rounded-full hover:bg-white/10 transition-colors">🌙</button>
+                <a href="catalog.html" class="text-gray-400 hover:text-white text-sm font-semibold transition-colors">Ver Catálogo</a>
+                <button id="btnLogout" class="text-red-400 hover:text-red-300 text-sm font-semibold transition-colors">Salir</button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="flex max-w-7xl mx-auto">
+
+        <!-- Sidebar -->
+        <aside class="w-56 min-h-screen border-r border-white/10 bg-spotlight-dark/30 hidden md:block flex-shrink-0">
+            <nav class="p-4 space-y-1 sticky top-16 pt-6">
+                <button onclick="setTab('dashboard')" class="sidebar-link active w-full flex items-center gap-3 px-4 py-3 rounded-r-xl text-left text-sm font-semibold transition-all">
+                    <span>📊</span> Dashboard
+                </button>
+                <button onclick="setTab('espacios')" class="sidebar-link w-full flex items-center gap-3 px-4 py-3 rounded-r-xl text-left text-sm font-semibold text-gray-400 hover:text-white transition-all">
+                    <span>🏟️</span> Mis Espacios
+                </button>
+                <button onclick="setTab('reservas')" class="sidebar-link w-full flex items-center gap-3 px-4 py-3 rounded-r-xl text-left text-sm font-semibold text-gray-400 hover:text-white transition-all">
+                    <span>📋</span> Reservas
+                </button>
+                <button onclick="setTab('publicar')" class="sidebar-link w-full flex items-center gap-3 px-4 py-3 rounded-r-xl text-left text-sm font-semibold text-gray-400 hover:text-white transition-all">
+                    <span>➕</span> Publicar Espacio
+                </button>
+                <div class="border-t border-white/10 mt-4 pt-4">
+                    <a href="profile.html" class="sidebar-link w-full flex items-center gap-3 px-4 py-3 rounded-r-xl text-left text-sm font-semibold text-gray-400 hover:text-white transition-all">
+                        <span>👤</span> Mi Perfil
+                    </a>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Contenido principal -->
+        <main class="flex-1 p-6 min-w-0">
+
+            <!-- ═══ TAB: DASHBOARD ═══ -->
+            <section id="tab-dashboard">
+                <div class="mb-6">
+                    <h1 class="text-3xl font-bold">Dashboard <span class="text-spotlight-cyan">en Tiempo Real</span></h1>
+                    <p class="text-gray-400 text-sm mt-1">Resumen de tu negocio en Spotlight Events</p>
+                </div>
+
+                <!-- Métricas principales -->
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8" id="metricas-grid">
+                    <!-- Generadas por JS -->
+                </div>
+
+                <!-- Gráficas -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                    <!-- Ingresos 6 meses -->
+                    <div class="stat-card rounded-2xl p-6">
+                        <h3 class="font-bold mb-1">Ingresos últimos 6 meses</h3>
+                        <p class="text-xs text-gray-500 mb-4">En COP</p>
+                        <div class="chart-container">
+                            <canvas id="chartIngresos"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Reservas por categoría -->
+                    <div class="stat-card rounded-2xl p-6">
+                        <h3 class="font-bold mb-1">Reservas por tipo de espacio</h3>
+                        <p class="text-xs text-gray-500 mb-4">Distribución actual</p>
+                        <div class="chart-container">
+                            <canvas id="chartTipos"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recomendación de precio + Últimas reservas -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <!-- Alerta de precio -->
+                    <div id="recomendacionPrecio" class="stat-card rounded-2xl p-6 border-l-4 border-spotlight-cyan lg:col-span-1">
+                        <div class="text-2xl mb-2">💡</div>
+                        <h3 class="font-bold mb-1">Recomendación</h3>
+                        <p id="textoRecomendacion" class="text-sm text-gray-400">Calculando...</p>
+                    </div>
+
+                    <!-- Últimas reservas -->
+                    <div class="stat-card rounded-2xl p-6 lg:col-span-2">
+                        <h3 class="font-bold mb-4">Últimas Reservas</h3>
+                        <div id="ultimasReservas" class="space-y-3">
+                            <!-- Generadas por JS -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ═══ TAB: MIS ESPACIOS ═══ -->
+            <section id="tab-espacios" class="hidden">
+                <div class="flex items-center justify-between mb-6">
+                    <h1 class="text-3xl font-bold">Mis <span class="text-spotlight-cyan">Espacios</span></h1>
+                    <button onclick="setTab('publicar')" class="bg-spotlight-cyan hover:bg-cyan-400 text-black font-bold py-2 px-5 rounded-xl transition-all">
+                        + Publicar Nuevo
+                    </button>
+                </div>
+                <div id="grid-mis-espacios" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div class="col-span-full text-center py-10 text-gray-500 animate-pulse">Cargando espacios...</div>
+                </div>
+            </section>
+
+            <!-- ═══ TAB: RESERVAS ═══ -->
+            <section id="tab-reservas" class="hidden">
+                <h1 class="text-3xl font-bold mb-6">Historial de <span class="text-spotlight-cyan">Reservas</span></h1>
+                <div id="listaReservasHost" class="space-y-4">
+                    <!-- Generadas por JS -->
+                </div>
+            </section>
+
+            <!-- ═══ TAB: PUBLICAR ═══ -->
+            <section id="tab-publicar" class="hidden">
+                <h1 class="text-3xl font-bold mb-6">Publicar <span class="text-spotlight-cyan">Nuevo Espacio</span></h1>
+                <div class="stat-card rounded-2xl p-8 max-w-2xl">
+                    <form id="formNuevo" class="space-y-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs uppercase text-gray-500 mb-1">Nombre del Espacio</label>
+                                <input type="text" id="esp-nombre" required class="w-full bg-black border border-white/10 rounded-xl px-4 py-3 text-white outline-none focus:border-spotlight-cyan transition-colors">
+                            </div>
+                            <div>
+                                <label class="block text-xs uppercase text-gray-500 mb-1">Categoría</label>
+                                <select id="esp-cat" class="w-full bg-black border border-white/10 rounded-xl px-4 py-3 text-white outline-none focus:border-spotlight-cyan">
+                                    <option value="Cancha Deportiva">Cancha Deportiva</option>
+                                    <option value="Salón de Eventos">Salón de Eventos</option>
+                                    <option value="Auditorio Empresarial">Auditorio Empresarial</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs uppercase text-gray-500 mb-1">Barrio</label>
+                                <input type="text" id="esp-barrio" required class="w-full bg-black border border-white/10 rounded-xl px-4 py-3 text-white outline-none focus:border-spotlight-cyan">
+                            </div>
+                            <div>
+                                <label class="block text-xs uppercase text-gray-500 mb-1">Capacidad (personas)</label>
+                                <input type="number" id="esp-capacidad" required min="1" placeholder="Ej. 50" class="w-full bg-black border border-white/10 rounded-xl px-4 py-3 text-white outline-none focus:border-spotlight-cyan">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-xs uppercase text-gray-500 mb-1">Descripción</label>
+                            <textarea id="esp-desc" required rows="3" class="w-full bg-black border border-white/10 rounded-xl px-4 py-3 text-white outline-none focus:border-spotlight-cyan resize-none"></textarea>
+                        </div>
+                        <div>
+                            <label class="block text-xs uppercase text-gray-500 mb-1">¿Qué incluye? <span class="text-gray-600">(separado por comas)</span></label>
+                            <input type="text" id="esp-incluye" placeholder="Parqueadero, Baños, Wi-Fi..." class="w-full bg-black border border-white/10 rounded-xl px-4 py-3 text-white outline-none focus:border-spotlight-cyan">
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs uppercase text-gray-500 mb-1">Precio por Hora (COP) <span id="precio-sugerido" class="text-spotlight-cyan font-bold normal-case"></span></label>
+                                <input type="number" id="esp-precio" required min="10000" class="w-full bg-black border border-white/10 rounded-xl px-4 py-3 text-white outline-none focus:border-spotlight-cyan">
+                            </div>
+                            <div>
+                                <label class="block text-xs uppercase text-gray-500 mb-1">URL de Imagen (opcional)</label>
+                                <input type="url" id="esp-img" placeholder="https://..." class="w-full bg-black border border-white/10 rounded-xl px-4 py-3 text-white outline-none focus:border-spotlight-cyan">
+                            </div>
+                        </div>
+                        <button type="submit" id="btnGuardar" class="w-full bg-spotlight-cyan hover:bg-cyan-400 text-black font-bold py-3 rounded-xl transition-all shadow-[0_0_15px_rgba(0,224,255,0.3)]">
+                            🚀 Publicar Espacio
+                        </button>
+                    </form>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script type="module">
+        import { requerirRol, } from '../js/guards/authGuard.js';
+        import { cerrarSesion } from '../js/services/auth.js';
+        import { obtenerEspaciosPorAnfitrion, publicarNuevoEspacio, obtenerTodosLosEspacios } from '../js/services/db.js';
+        import { inicializarTema } from '../js/components/theme.js';
+
+        inicializarTema();
+
+        const hostUser = requerirRol('host');
+        if (!hostUser) return;
+
+        // Mostrar nombre en navbar
+        document.getElementById('hostNameNav').textContent = hostUser.nombre || hostUser.email;
+        document.getElementById('btnLogout').addEventListener('click', cerrarSesion);
+
+        // ═══════ DATOS DEMO PARA EL DASHBOARD ═══════
+        const historialReservas = JSON.parse(localStorage.getItem('bookingHistory') || '[]');
+        
+        // Simular datos de ingresos del anfitrión si no hay datos
+        const ingresosDemo = [1800000, 2400000, 1950000, 3100000, 2750000, 3500000];
+        const mesesLabels = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio'];
+        const totalIngresos = ingresosDemo.reduce((a,b) => a+b, 0);
+        const reservasTotales = 34;
+        const ratingPromedio = 4.8;
+        const vistasPerfil = 1247;
+        const ocupacion = 82; // porcentaje
+
+        // ═══ MÉTRICAS CARDS ═══
+        const metricas = [
+            { label: 'Ingresos este mes', valor: '$3.500.000', sub: 'COP', icon: '💰', color: 'text-green-400', glow: 'rgba(74,222,128,0.1)' },
+            { label: 'Reservas totales', valor: reservasTotales, sub: 'completadas', icon: '📋', color: 'text-spotlight-cyan', glow: 'rgba(0,224,255,0.1)' },
+            { label: 'Calificación', valor: ratingPromedio + '⭐', sub: 'promedio', icon: '⭐', color: 'text-yellow-400', glow: 'rgba(234,179,8,0.1)' },
+            { label: 'Vistas al perfil', valor: vistasPerfil.toLocaleString(), sub: 'este mes', icon: '👁️', color: 'text-purple-400', glow: 'rgba(167,139,250,0.1)' },
+        ];
+        document.getElementById('metricas-grid').innerHTML = metricas.map(m => `
+            <div class="stat-card rounded-2xl p-5" style="box-shadow: 0 0 20px ${m.glow}">
+                <div class="flex items-start justify-between mb-3">
+                    <p class="text-xs text-gray-500 uppercase tracking-wider">${m.label}</p>
+                    <span class="text-2xl">${m.icon}</span>
+                </div>
+                <p class="text-2xl font-bold ${m.color}">${m.valor}</p>
+                <p class="text-xs text-gray-500 mt-1">${m.sub}</p>
+            </div>
+        `).join('');
+
+        // ═══ GRÁFICA DE INGRESOS ═══
+        const ctxIngresos = document.getElementById('chartIngresos').getContext('2d');
+        new Chart(ctxIngresos, {
+            type: 'bar',
+            data: {
+                labels: mesesLabels,
+                datasets: [{
+                    label: 'Ingresos COP',
+                    data: ingresosDemo,
+                    backgroundColor: 'rgba(0,224,255,0.15)',
+                    borderColor: '#00E0FF',
+                    borderWidth: 2,
+                    borderRadius: 8,
+                    hoverBackgroundColor: 'rgba(0,224,255,0.3)',
+                }]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#6B7280', callback: v => '$'+v.toLocaleString('es-CO') } },
+                    x: { grid: { display: false }, ticks: { color: '#6B7280' } }
+                }
+            }
+        });
+
+        // ═══ GRÁFICA DE TIPOS ═══
+        const ctxTipos = document.getElementById('chartTipos').getContext('2d');
+        new Chart(ctxTipos, {
+            type: 'doughnut',
+            data: {
+                labels: ['Canchas', 'Salones', 'Auditorios'],
+                datasets: [{
+                    data: [18, 11, 5],
+                    backgroundColor: ['#00E0FF', '#FF007F', '#7C3AED'],
+                    borderColor: '#111',
+                    borderWidth: 3,
+                }]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'bottom', labels: { color: '#9CA3AF', padding: 16, font: { size: 12 } } }
+                }
+            }
+        });
+
+        // ═══ RECOMENDACIÓN DE PRECIO ═══
+        const recomendacion = ocupacion > 80
+            ? `🚀 Tu ocupación es del <strong>${ocupacion}%</strong>. Considera subir tus precios un 10% para maximizar ganancias. El mercado aguanta el ajuste.`
+            : `📈 Tu ocupación está al ${ocupacion}%. Puedes ofrecer un <strong>5% de descuento</strong> en horarios de baja demanda para atraer más reservas.`;
+        document.getElementById('textoRecomendacion').innerHTML = recomendacion;
+
+        // ═══ ÚLTIMAS RESERVAS ═══
+        const reservasDemo = [
+            { espacio: 'Arena Sport Complex', usuario: 'andres.p@gmail.com', monto: 140000, fecha: '2026-06-08', estado: 'completada' },
+            { espacio: 'La Bombonera Sport', usuario: 'maria.l@gmail.com', monto: 120000, fecha: '2026-06-07', estado: 'completada' },
+            { espacio: 'Arena Sport Complex', usuario: 'carlos.r@gmail.com', monto: 280000, fecha: '2026-06-05', estado: 'completada' },
+            { espacio: 'Pabellón de Cristal', usuario: 'lucia.m@gmail.com', monto: 350000, fecha: '2026-06-03', estado: 'completada' },
+        ];
+        document.getElementById('ultimasReservas').innerHTML = reservasDemo.map(r => `
+            <div class="flex items-center justify-between p-3 bg-white/5 rounded-xl border border-white/5 hover:border-white/10 transition-colors">
+                <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-full bg-spotlight-cyan/10 flex items-center justify-center text-spotlight-cyan font-bold text-sm">${r.usuario[0].toUpperCase()}</div>
+                    <div>
+                        <p class="font-semibold text-sm">${r.espacio}</p>
+                        <p class="text-xs text-gray-500">${r.usuario} • ${r.fecha}</p>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <p class="font-bold text-green-400 text-sm">+$${r.monto.toLocaleString('es-CO')}</p>
+                    <span class="text-[10px] text-green-400 font-semibold uppercase">✓ ${r.estado}</span>
+                </div>
+            </div>
+        `).join('');
+
+        // ═══ MIS ESPACIOS ═══
+        const grid = document.getElementById('grid-mis-espacios');
+        
+        // Si es usuario demo, mostrar espacios demo sin Firebase
+        const isDemoUser = hostUser.uid && hostUser.uid.startsWith('demo-');
+        
+        if (isDemoUser) {
+            const espaciosDemo = [
+                { nombre: 'Arena Sport Complex', barrio: 'El Prado', categoria: 'Cancha Deportiva', precioPorHora: 140000, imagen: 'https://images.unsplash.com/photo-1575361204480-aadea25e6e68?auto=format&fit=crop&w=400&q=80' },
+                { nombre: 'La Bombonera Sport', barrio: 'Manga', categoria: 'Cancha Deportiva', precioPorHora: 120000, imagen: 'https://images.unsplash.com/photo-1551958219-acbc84a82fd1?auto=format&fit=crop&w=400&q=80' },
+                { nombre: 'Pabellón de Cristal', barrio: 'Centro', categoria: 'Salón de Eventos', precioPorHora: 350000, imagen: 'https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&w=400&q=80' },
+            ];
+            grid.innerHTML = espaciosDemo.map(e => `
+                <div class="bg-spotlight-dark border border-white/10 rounded-2xl overflow-hidden group hover:border-spotlight-cyan/30 transition-colors">
+                    <div class="h-40 overflow-hidden relative">
+                        <img src="${e.imagen}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                        <div class="absolute top-2 right-2 bg-black/80 px-2 py-1 rounded-lg text-xs text-spotlight-cyan border border-white/10">${e.categoria}</div>
+                    </div>
+                    <div class="p-5">
+                        <h3 class="font-bold">${e.nombre}</h3>
+                        <p class="text-sm text-gray-400 mb-2">📍 ${e.barrio}</p>
+                        <p class="text-spotlight-cyan font-bold">$${parseInt(e.precioPorHora).toLocaleString('es-CO')} <span class="text-xs text-gray-500 font-normal">COP/h</span></p>
+                    </div>
+                </div>
+            `).join('');
+        } else {
+            try {
+                const todos = await obtenerTodosLosEspacios();
+                const misEspacios = todos.filter(e => e.hostUid === hostUser.uid || e.hostEmail === hostUser.email);
+                if (misEspacios.length === 0) {
+                    grid.innerHTML = `<div class="col-span-full text-center py-16 text-gray-500">
+                        <div class="text-5xl mb-4">🏙️</div>
+                        <p class="mb-4">Aún no tienes espacios publicados.</p>
+                        <button onclick="setTab('publicar')" class="bg-spotlight-cyan text-black font-bold px-6 py-2 rounded-xl">+ Publicar mi primer espacio</button>
+                    </div>`;
+                } else {
+                    grid.innerHTML = misEspacios.map(e => `
+                        <div class="bg-spotlight-dark border border-white/10 rounded-2xl overflow-hidden group hover:border-spotlight-cyan/30 transition-colors">
+                            <div class="h-40 overflow-hidden relative">
+                                <img src="${e.imagen || 'https://images.unsplash.com/photo-1575361204480-aadea25e6e68?auto=format&fit=crop&w=400&q=80'}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                                <div class="absolute top-2 right-2 bg-black/80 px-2 py-1 rounded-lg text-xs text-spotlight-cyan border border-white/10">${e.categoria}</div>
+                            </div>
+                            <div class="p-5">
+                                <h3 class="font-bold">${e.nombre}</h3>
+                                <p class="text-sm text-gray-400 mb-2">📍 ${e.barrio}</p>
+                                <p class="text-spotlight-cyan font-bold">$${parseInt(e.precioPorHora).toLocaleString('es-CO')} <span class="text-xs text-gray-500 font-normal">COP/h</span></p>
+                            </div>
+                        </div>
+                    `).join('');
+                }
+            } catch(e) {
+                grid.innerHTML = '<p class="text-center text-gray-500 py-10">Error cargando espacios. Revisa tu conexión.</p>';
+            }
+        }
+
+        // ═══ HISTORIAL RESERVAS HOST ═══
+        const lista = document.getElementById('listaReservasHost');
+        if (reservasDemo.length) {
+            lista.innerHTML = reservasDemo.map(r => `
+                <div class="bg-spotlight-dark border border-white/10 rounded-2xl p-5 flex items-center justify-between gap-4">
+                    <div><p class="font-bold">${r.espacio}</p><p class="text-sm text-gray-400">${r.usuario} • ${r.fecha}</p></div>
+                    <div class="text-right">
+                        <p class="font-bold text-green-400">+$${r.monto.toLocaleString('es-CO')}</p>
+                        <span class="text-xs text-green-400">✓ ${r.estado}</span>
+                    </div>
+                </div>
+            `).join('');
+        } else {
+            lista.innerHTML = '<p class="text-gray-500 text-center py-10">No hay reservas aún.</p>';
+        }
+
+        // ═══ PUBLICAR NUEVO ESPACIO ═══
+        const espCat = document.getElementById('esp-cat');
+        const espCapacidad = document.getElementById('esp-capacidad');
+        function actualizarPrecioSugerido() {
+            let base = 50000, cap = parseInt(espCapacidad.value) || 0;
+            if (espCat.value === 'Cancha Deportiva') base = 80000 + cap * 2000;
+            if (espCat.value === 'Salón de Eventos') base = 150000 + cap * 3000;
+            if (espCat.value === 'Auditorio Empresarial') base = 250000 + cap * 4000;
+            document.getElementById('precio-sugerido').textContent = cap > 0 ? `(Sugerido: $${base.toLocaleString('es-CO')})` : '';
+        }
+        espCat.addEventListener('change', actualizarPrecioSugerido);
+        espCapacidad.addEventListener('input', actualizarPrecioSugerido);
+
+        document.getElementById('formNuevo').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('btnGuardar');
+            btn.textContent = 'Publicando...'; btn.disabled = true;
+            const nuevoEspacio = {
+                hostUid: hostUser.uid, hostEmail: hostUser.email,
+                nombre: document.getElementById('esp-nombre').value,
+                categoria: document.getElementById('esp-cat').value,
+                barrio: document.getElementById('esp-barrio').value,
+                capacidad: parseInt(document.getElementById('esp-capacidad').value) || 0,
+                descripcion: document.getElementById('esp-desc').value,
+                incluye: document.getElementById('esp-incluye').value.split(',').map(s => s.trim()).filter(Boolean),
+                precioPorHora: parseInt(document.getElementById('esp-precio').value),
+                imagen: document.getElementById('esp-img').value || '',
+                creadoEn: new Date().toISOString()
+            };
+            const res = await publicarNuevoEspacio(nuevoEspacio);
+            if (res.success) {
+                alert('¡Espacio publicado! Ya aparece en el catálogo.');
+                document.getElementById('formNuevo').reset();
+                setTab('espacios');
+            } else { alert('Error: ' + res.error); }
+            btn.textContent = '🚀 Publicar Espacio'; btn.disabled = false;
+        });
+    </script>
+
+    <script>
+        // Navegación entre tabs
+        window.setTab = (id) => {
+            ['dashboard','espacios','reservas','publicar'].forEach(t => {
+                document.getElementById('tab-'+t)?.classList.add('hidden');
+            });
+            document.getElementById('tab-'+id)?.classList.remove('hidden');
+            document.querySelectorAll('.sidebar-link').forEach(b => {
+                b.classList.remove('active','text-spotlight-cyan');
+                b.classList.add('text-gray-400');
+            });
+            const activeBtn = document.querySelector(`[onclick="setTab('${id}')"]`);
+            if(activeBtn) { activeBtn.classList.add('active','text-spotlight-cyan'); activeBtn.classList.remove('text-gray-400'); }
+        };
+
+        // Tema
+        window.toggleTheme = () => {
+            document.body.classList.toggle('light-mode');
+            const isLight = document.body.classList.contains('light-mode');
+            localStorage.setItem('spotlight_theme', isLight ? 'light' : 'dark');
+            document.querySelectorAll('.btn-theme-toggle').forEach(b => b.textContent = isLight ? '☀️' : '🌙');
+        };
+        if(localStorage.getItem('spotlight_theme')==='light'){
+            document.body.classList.add('light-mode');
+            setTimeout(()=>document.querySelectorAll('.btn-theme-toggle').forEach(b=>b.textContent='☀️'),100);
+        }
+    </script>
+</body>
+</html>
